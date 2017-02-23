@@ -1,6 +1,6 @@
 {
   "name": "kc-vue-dfp",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "A package for google dfp in framwork vue.",
   "main": "lib/index.js",
   "scripts": {

@@ -17,7 +17,7 @@ Then, just import it like:
 And with a few steps like:
 
 1、 have `VueDfpProvider` be a component:
-```
+```javascript
 <script>
   export default {
     ...
@@ -32,7 +32,7 @@ And with a few steps like:
 ```
 
 2、 have to compose an object, its structure looks like:
-```
+```javascript
 adunits: {
   'section-id': {
     'POSITION1': {
@@ -49,7 +49,7 @@ adunits: {
 }
 ```
 Put object `adunits` to data:
-```
+```javascript
   export default {
     ...
     data() {
@@ -64,10 +64,12 @@ Put object `adunits` to data:
 ```
 
 3、 do some markups in template:
-```
+```javascript
 <template>
   <vue-dfp-provider :dfpUnits="dfpUnits" :dfpid="dfpid" :section="sectionId">
     <template scope="props" slot="dfpPos">
+      //Put all markups in this slot would be the better way to use this pack.
+      //And, "<vue-dfp ... />" is the primary component to place DFP ads 
       <vue-dfp :is="props.vueDfp" extclass="ext-class-1" pos="POSITION1" :dfpUnits="props.dfpUnits" :section="props.section" />
       <vue-dfp :is="props.vueDfp" extclass="ext-class-2 ext-class-3" pos="POSITION2" :dfpUnits="props.dfpUnits" :section="props.section" />
     </template>
@@ -76,7 +78,7 @@ Put object `adunits` to data:
 ```
 
 Then, the template will be rendered to:
-```
+```javascript
 <div>
   <div class="class-1 center ext-class-1" id="ADUNIT-ID-1" adunit="ADUNIT-ID-1" pos="POSITION1"></div> 
   <div class="class-2 ext-class-2 ext-class-3" id="ADUNIT-ID-2" adunit="ADUNIT-ID-2" pos="POSITION2"></div>
