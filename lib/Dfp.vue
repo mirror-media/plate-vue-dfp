@@ -30,19 +30,9 @@
     }
   }
 </script>
-<style lang="stylus" scoped>
-  .ad-container {
-    display: inline-block;
-    margin-top: 20px;
-    &.margin-top-30px {
-      margin-top: 30px;
-    }
-    &.margin-top-0 {
-      margin-top: 0;
-    }
-    &.center {
-      display: flex;
-      justify-content: center;
-    }
-  }
+<style scoped>
+  .ad-container { display: inline-block; margin-top: 20px; }
+  .ad-container.margin-top-30px { margin-top: 30px; }
+  .ad-container.margin-top-0 { margin-top: 0; }
+  .ad-container.center { display: flex; justify-content: center; }  
 </style>
