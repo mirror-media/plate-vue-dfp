@@ -1,0 +1,19 @@
+{
+  "name": "kc-vue-dfp",
+  "version": "0.0.3",
+  "description": "A package for google dfp in framwork vue.",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chiangkeith/kc-vue-dfp.git"
+  },
+  "author": "K.C.Keith Chiang",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/chiangkeith/kc-vue-dfp/issues"
+  },
+  "homepage": "https://github.com/chiangkeith/kc-vue-dfp#readme"
+}
