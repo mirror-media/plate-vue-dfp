@@ -12,7 +12,7 @@ Installing this package from npm like:
 
 Then, just import it like:
 
-  `import VueDfpProvider from 'kc-vue-dfp';`
+  `import VueDfpProvider from 'kc-vue-dfp/DfpProvider.vue';`
 
 And with a few steps like:
 
