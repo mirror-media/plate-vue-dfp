@@ -157,7 +157,13 @@
         if (typeof dimes !== 'undefined' && dimes !== '') {
           dimes.split(',').forEach((v) => {
             const dimensionSet = v.split('x')
-            dimensions.push([parseInt(dimensionSet[0], 10), parseInt(dimensionSet[1], 10)])
+            if(dimensionSet.length > 1) {
+              dimensions.push([parseInt(dimensionSet[0], 10), parseInt(dimensionSet[1], 10)])
+            } else {
+              if(dimensionSet[0] === 'fluid') {
+                dimensions.push(dimensionSet[0])
+              }
+            }
           })
         } else {
           dimensions.push([this.$el.offsetWidth, this.$el.offsetHeight])

@@ -1,5 +1,5 @@
 <template>
-  <div :class="`${className} ${extClass}`" :id="adunit" :adunit="adunit" :pos="pos"></div>
+  <div :class="`${className} ${extClass}`" :id="adunit" :adunit="adunit" :pos="pos" :style="style"></div>
 </template>
 <script>
   export default {
@@ -10,6 +10,9 @@
       className() {
         return this.dfpUnits[ this.section ][ this.pos ][ 'cont-class' ].join(' ')
       },
+      style() {
+        return this.dfpUnits[ this.section ][ this.pos ][ 'cont-style' ].join(';')
+      }
     },
     name: 'ad-container',
     mounted() {
