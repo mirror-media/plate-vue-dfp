@@ -28,7 +28,7 @@
         default: () => { return '' }
       },
       section: {
-        default: () => { return '' }
+        default: () => { return 'default' }
       }
     }
   }

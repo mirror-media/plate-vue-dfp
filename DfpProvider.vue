@@ -24,12 +24,17 @@
     name: 'vue-dfp-provider',
     methods: {
       defineDfp() {
+        let slots = [];
         document.querySelectorAll('.ad-container').forEach((slot) => {
-            googletag.defineSlot(`/${this.dfpid}/${this.dfpUnits[ this.section ][ slot.getAttribute('pos') ][ 'aduid' ]}`
+            const _s = googletag.defineSlot(`/${this.dfpid}/${this.dfpUnits[ this.section ][ slot.getAttribute('pos') ][ 'aduid' ]}`
                                   , this.getDimensions(this.dfpUnits[ this.section ][ slot.getAttribute('pos') ][ 'dimensions' ])
                                   , this.dfpUnits[ this.section ][ slot.getAttribute('pos') ][ 'aduid' ]).addService(googletag.pubads());
+            slots.push(_s)
             googletag.display(this.dfpUnits[ this.section ][ slot.getAttribute('pos') ][ 'aduid' ]);
+            // googletag.pubads().refresh([_s]);
+
         })
+        // googletag.pubads().refresh(slots);
       },
       loadDfp() {
         return new Promise((resolve) => {
@@ -169,7 +174,7 @@
           dimensions.push([this.$el.offsetWidth, this.$el.offsetHeight])
         }
         return dimensions
-      }
+      },
     },
     mounted() {
       this.loadDfp()
@@ -177,8 +182,12 @@
         this.initDfp()
         this.defineDfp()
       })
-      document.addEventListener('DOMContentLoaded', () => {
-      })
+      document.addEventListener('DOMContentLoaded', () => {})
+      if(googletag && googletag.apiReady) {
+        googletag.destroySlots()
+        this.initDfp()
+        this.defineDfp()
+      }
     },
     props: {
       dfpid: {
@@ -188,9 +197,9 @@
         default: () => { return {} }
       },
       section: {
-        default: () => { return '' }
+        default: () => { return 'default' }
       },
-    }
+    },
   }
 </script>
 <style></style>
