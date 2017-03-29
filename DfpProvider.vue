@@ -1,6 +1,6 @@
 <template>
   <div>
-    <slot name="dfpPos" :vueDfp="dfpPos" :dfpUnits="dfpUnits" :section="section"></slot>
+    <slot name="dfpPos" :vueDfp="dfpPos" :dfpUnits="dfpUnits" :section="section" :dfpId="dfpid"></slot>
   </div>
 </template>
 <script>
@@ -24,15 +24,19 @@
     name: 'vue-dfp-provider',
     methods: {
       defineDfp() {
-        let slots = [];
+        // let slots = [];
         document.querySelectorAll('.ad-container').forEach((slot) => {
-            const _s = googletag.defineSlot(`/${this.dfpid}/${this.dfpUnits[ this.section ][ slot.getAttribute('pos') ][ 'aduid' ]}`
-                                  , this.getDimensions(this.dfpUnits[ this.section ][ slot.getAttribute('pos') ][ 'dimensions' ])
-                                  , this.dfpUnits[ this.section ][ slot.getAttribute('pos') ][ 'aduid' ]).addService(googletag.pubads());
-            slots.push(_s)
-            googletag.display(this.dfpUnits[ this.section ][ slot.getAttribute('pos') ][ 'aduid' ]);
-            // googletag.pubads().refresh([_s]);
-
+            slot.removeAttribute('data-google-query-id');
+            const _aduid = slot.getAttribute('adunit')
+            const _pos = slot.getAttribute('pos')
+            const _ifSlotVisible = slot.currentStyle ? slot.currentStyle.display : getComputedStyle(slot, null).display;
+            if(_ifSlotVisible === 'none') { return }
+            const _s = googletag.defineSlot(`/${this.dfpid}/${_aduid}`
+                                  , this.getDimensions(this.dfpUnits[ this.section ][ _pos ][ 'dimensions' ])
+                                  , _aduid).addService(googletag.pubads());
+            // slots.push(_s)
+            googletag.display(_aduid);
+            googletag.pubads().refresh([_s]);
         })
         // googletag.pubads().refresh(slots);
       },
@@ -53,14 +57,23 @@
             this.adsCouldNeverBeInitilized = true
             resolve()
           }
-          gads.onload = function() {
-            // this will work with ghostery:
+          // gads.onload = function() {
+          //   // this will work with ghostery:
+          //   if (!googletag._loadStarted_) {
+          //     googletag._adBlocked_ = true
+          //   }
+          //   this.dfpIsLoaded = true
+          //   resolve()
+          // }
+          // take https://developers.google.com/doubleclick-gpt/common_implementation_mistakes for ref and revise the above codes to below codes
+          googletag.cmd.push(function() {
             if (!googletag._loadStarted_) {
               googletag._adBlocked_ = true
             }
             this.dfpIsLoaded = true
             resolve()
-          }
+          });
+
           let useSSL = 'https:' === document.location.protocol
           gads.src = (useSSL ? 'https:' : 'http:') +
           '//www.googletagservices.com/tag/js/gpt.js'
@@ -81,7 +94,7 @@
           companionAds: true,
           refreshExisting: true,
           disablePublisherConsole: false,
-          disableInitialLoad: false,
+          disableInitialLoad: true,
           setCentering: false,
           noFetch: false,
           namespace: undefined,
@@ -177,14 +190,14 @@
       },
     },
     mounted() {
-      this.loadDfp()
-      window.addEventListener('load', (e) => {
-        this.initDfp()
-        this.defineDfp()
+      this.loadDfp().then(() => {
+        this.initDfp();
+        this.defineDfp();
       })
       document.addEventListener('DOMContentLoaded', () => {})
       if(googletag && googletag.apiReady) {
         googletag.destroySlots()
+        // googletag.pubads().clear();
         this.initDfp()
         this.defineDfp()
       }
@@ -200,6 +213,13 @@
         default: () => { return 'default' }
       },
     },
+    watch: {
+      section: function() {
+        googletag.destroySlots()
+        this.initDfp()
+        // this.defineDfp()
+      }
+    }
   }
 </script>
 <style></style>
