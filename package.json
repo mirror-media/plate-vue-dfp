@@ -1,6 +1,11 @@
 {
+<<<<<<< HEAD
     "name": "kc-vue-dfp",
     "version": "1.0.2",
+=======
+    "name": "plate-vue-dfp",
+    "version": "1.0.4",
+>>>>>>> add a new class style for dfp component
     "description": "A package for google dfp in framwork vue.",
     "main": "DfpProvider.vue",
     "scripts": {
@@ -8,12 +13,12 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/chiangkeith/kc-vue-dfp.git"
+        "url": "git+https://github.com/mirror-media/plate-vue-dfp.git"
     },
     "author": "K.C.Keith Chiang",
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/chiangkeith/kc-vue-dfp/issues"
+        "url": "https://github.com/mirror-media/plate-vue-dfp/issues"
     },
-    "homepage": "https://github.com/chiangkeith/kc-vue-dfp#readme"
+    "homepage": "https://github.com/mirror-media/plate-vue-dfp#readme"
 }
