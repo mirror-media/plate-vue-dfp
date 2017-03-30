@@ -1,4 +1,4 @@
-# kc-vue-dfp
+# plate-vue-dfp
 A package for google dfp in framwork vue.
 
 # lib/index.js
