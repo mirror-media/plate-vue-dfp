@@ -1,11 +1,6 @@
 {
-<<<<<<< HEAD
-    "name": "kc-vue-dfp",
-    "version": "1.0.2",
-=======
     "name": "plate-vue-dfp",
     "version": "1.0.4",
->>>>>>> add a new class style for dfp component
     "description": "A package for google dfp in framwork vue.",
     "main": "DfpProvider.vue",
     "scripts": {
