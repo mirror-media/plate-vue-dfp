@@ -8,11 +8,11 @@ This package is inspired by [dfp-vue](https://github.com/hinablue/dfp-vue) as we
 
 Installing this package from npm like:
 
-  `$ npm install kc-vue-dfp@latest --save `
+  `$ npm install plate-vue-dfp@latest --save `
 
 Then, just import it like:
 
-  `import VueDfpProvider from 'kc-vue-dfp/DfpProvider.vue';`
+  `import VueDfpProvider from 'plate-vue-dfp/DfpProvider.vue';`
 
 And with a few steps like:
 
