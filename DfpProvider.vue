@@ -38,6 +38,9 @@
             googletag.display(_aduid);
             googletag.pubads().refresh([_s]);
         })
+        if(this.options[ 'afterEachAdLoaded' ]) {
+          googletag.pubads().addEventListener('slotRenderEnded', this.options[ 'afterEachAdLoaded' ]);
+        }
         // googletag.pubads().refresh(slots);
       },
       loadDfp() {
@@ -84,7 +87,7 @@
       initDfp() {
         window.googletag = window.googletag || {};
         googletag.cmd = googletag.cmd || [];
-        let dfpOptions = {
+        let dfpOptions = Object.assign({
           dfpID: '',
           setTargeting: {},
           setCategoryExclusion: '',
@@ -105,7 +108,8 @@
           rendered: 0,
           onloaded: [],
           adUnits: []
-        }
+        }, this.options)
+
         googletag.cmd.push(() => {
           let pubadsService = googletag.pubads()
           /** https://developers.google.com/doubleclick-gpt/reference#googletag.pubads **/
@@ -207,6 +211,9 @@
         default: () => { return '' }
       },
       dfpUnits: {
+        default: () => { return {} }
+      },
+      options: {
         default: () => { return {} }
       },
       section: {
