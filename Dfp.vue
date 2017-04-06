@@ -1,5 +1,5 @@
 <template>
-  <div :class="`${className} ${extClass}`" :id="adunit" :adunit="adunit" :pos="pos" :style="style"></div>
+  <div :class="`${className} ${extClass}`" :id="adunit" :pos="pos" :style="style"></div>
 </template>
 <script>
   export default {
@@ -21,7 +21,7 @@
                               , this.getDimensions(this.dfpUnits[ this.section ][ this.pos ][ 'dimensions' ])
                               , this.dfpUnits[ this.section ][ this.pos ][ 'aduid' ]).addService(googletag.pubads());
         googletag.display(this.adunit);
-        googletag.pubads().refresh();
+        googletag.pubads().refresh([_s]);
       },
       getDimensions (dimes) {
         let dimensions = []
@@ -70,7 +70,7 @@
   }
 </script>
 <style scoped>
-  .ad-container { display: inline-block; margin-top: 20px; }
+  .ad-container { margin-top: 20px; }
   .ad-container.margin-top-30px { margin-top: 30px; }
   .ad-container.margin-top-0 { margin-top: 0; }
   .ad-container.center { display: flex; justify-content: center; margin-right: 0 auto; margin-left: 0 auto; }  
