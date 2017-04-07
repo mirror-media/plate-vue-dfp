@@ -26,21 +26,27 @@
       defineDfp() {
         // let slots = [];
         document.querySelectorAll('.ad-container').forEach((slot) => {
-            slot.removeAttribute('data-google-query-id');
-            const _aduid = slot.getAttribute('adunit')
+            // slot.removeAttribute('data-google-query-id')
+            const _aduid = slot.getAttribute('id')
             const _pos = slot.getAttribute('pos')
             const _ifSlotVisible = slot.currentStyle ? slot.currentStyle.display : getComputedStyle(slot, null).display;
             if(_ifSlotVisible === 'none') { return }
             const _s = googletag.defineSlot(`/${this.dfpid}/${_aduid}`
                                   , this.getDimensions(this.dfpUnits[ this.section ][ _pos ][ 'dimensions' ])
-                                  , _aduid).addService(googletag.pubads());
+                                  , _aduid).addService(googletag.pubads())
             // slots.push(_s)
-            googletag.display(_aduid);
-            googletag.pubads().refresh([_s]);
+            const mapping = (this.options[ 'sizeMapping' ] && this.dfpUnits[ this.section ][ _pos ][ 'size-mapping' ]) ? this.options[ 'sizeMapping' ][ this.dfpUnits[ this.section ][ _pos ][ 'size-mapping' ] ] : undefined
+            if (mapping) {
+                // Convert verbose to DFP format
+                let map = googletag.sizeMapping()
+                mapping.forEach((k, v) => {
+                  map = map.addSize(k.browser, k.ad_sizes)
+                })
+                _s.defineSizeMapping(map.build())
+            }
+            googletag.display(_aduid)
+            googletag.pubads().refresh([_s])
         })
-        if(this.options[ 'afterEachAdLoaded' ]) {
-          googletag.pubads().addEventListener('slotRenderEnded', this.options[ 'afterEachAdLoaded' ]);
-        }
         // googletag.pubads().refresh(slots);
       },
       loadDfp() {
@@ -94,11 +100,11 @@
           setLocation: '',
           enableSingleRequest: true,
           collapseEmptyDivs: 'original',
-          companionAds: true,
           refreshExisting: true,
           disablePublisherConsole: false,
           disableInitialLoad: true,
           setCentering: false,
+          setForceSafeFrame: false,
           noFetch: false,
           namespace: undefined,
           sizeMapping: [],
@@ -110,10 +116,14 @@
           adUnits: []
         }, this.options)
 
-        googletag.cmd.push(() => {
+        googletag.cmd.push(function() {
           let pubadsService = googletag.pubads()
           /** https://developers.google.com/doubleclick-gpt/reference#googletag.pubads **/
-          pubadsService.setForceSafeFrame(true)
+
+          if(dfpOptions.setForceSafeFrame) {
+            pubadsService.setForceSafeFrame(true)
+          }
+          
           /** https://developers.google.com/doubleclick-gpt/reference#googletag.PubAdsService_enableSingleRequest **/
           if (dfpOptions.enableSingleRequest) {
             pubadsService.enableSingleRequest()
@@ -170,6 +180,9 @@
           /** https://developers.google.com/doubleclick-gpt/reference#googletag.PubAdsService_setCentering **/
           if (dfpOptions.setCentering) {
             pubadsService.setCentering(true)
+          }
+          if(dfpOptions[ 'afterEachAdLoaded' ]) {
+            googletag.pubads().addEventListener('slotRenderEnded', dfpOptions[ 'afterEachAdLoaded' ]);
           }
           googletag.enableServices()
         })
