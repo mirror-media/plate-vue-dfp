@@ -10,6 +10,9 @@
       className() {
         return this.dfpUnits[ this.section ][ this.pos ][ 'cont-class' ].join(' ')
       },
+      currPath() {
+        return this.$route.fullPath
+      },
       style() {
         return this.dfpUnits[ this.section ][ this.pos ][ 'cont-style' ].join(';')
       }
@@ -64,9 +67,18 @@
     },
     updated() {
       if(googletag && googletag.apiReady) {
-        this.defineDfp()
+        // this.defineDfp()
       }
+      
     },
+    watch: {
+      currPath: function() {
+        // console.log('dfp currPath updated detected!')
+        // if(googletag && googletag.apiReady) {
+        //   this.defineDfp()
+        // }
+      }
+    }
   }
 </script>
 <style scoped>
