@@ -10,6 +10,9 @@
       'vue-dfp': VueDfp
     },
     computed: {
+      currPath() {
+        return this.$route.fullPath
+      },
       dfpPos() {
         return VueDfp
       }
@@ -234,12 +237,20 @@
       },
     },
     watch: {
+      currPath: function() {
+        // console.log('currPath updated detected!')
+        if(googletag && googletag.apiReady) {
+          googletag.destroySlots()
+          this.initDfp()
+          this.defineDfp()
+        }
+      },
       section: function() {
-        googletag.destroySlots()
-        this.initDfp()
+        // googletag.destroySlots()
+        // this.initDfp()
         // this.defineDfp()
       }
-    }
+    },
   }
 </script>
 <style></style>
