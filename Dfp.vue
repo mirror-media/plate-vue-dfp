@@ -7,13 +7,13 @@
       adunit() {
         return !this.unitId ? this.dfpUnits[ this.section ][ this.pos ][ 'aduid' ] : this.unitId
       },
-      className() {
+      className () {
         return this.dfpUnits[ this.section ][ this.pos ][ 'cont-class' ].join(' ')
       },
-      currPath() {
+      currPath () {
         return this.$route.fullPath
       },
-      style() {
+      style () {
         return this.dfpUnits[ this.section ][ this.pos ][ 'cont-style' ].join(';')
       }
     },
@@ -22,7 +22,19 @@
       defineDfp() {
         const _s = googletag.defineSlot(`/${this.dfpId}/${this.adunit}`
                               , this.getDimensions(this.dfpUnits[ this.section ][ this.pos ][ 'dimensions' ])
-                              , this.dfpUnits[ this.section ][ this.pos ][ 'aduid' ]).addService(googletag.pubads());
+                              , this.adunit).addService(googletag.pubads());
+        const slot = document.querySelector(`#${this.adunit}`)
+        const _ifSlotVisible = slot ? (slot.currentStyle ? slot.currentStyle.display : getComputedStyle(slot, null).display) : null;
+        if(_ifSlotVisible === 'none') { return }
+        const mapping = (this.options[ 'sizeMapping' ] && this.dfpUnits[ this.section ][ this.pos ][ 'size-mapping' ]) ? this.options[ 'sizeMapping' ][ this.dfpUnits[ this.section ][ this.pos ][ 'size-mapping' ] ] : undefined
+        if (mapping) {
+            // Convert verbose to DFP format
+            let map = googletag.sizeMapping()
+            mapping.forEach((k, v) => {
+              map = map.addSize(k.browser, k.ad_sizes)
+            })
+            _s.defineSizeMapping(map.build())
+        }
         googletag.display(this.adunit);
         googletag.pubads().refresh([_s]);
       },
@@ -55,6 +67,32 @@
       dfpUnits: {
         default: () => { return '' }
       },
+      options: {
+        default: () => {
+          return {
+            dfpID: '',
+            setTargeting: {},
+            setCategoryExclusion: '',
+            setLocation: '',
+            enableSingleRequest: true,
+            collapseEmptyDivs: 'original',
+            refreshExisting: true,
+            disablePublisherConsole: false,
+            disableInitialLoad: true,
+            setCentering: false,
+            setForceSafeFrame: false,
+            noFetch: false,
+            namespace: undefined,
+            sizeMapping: undefined,
+            afterAdBlocked: undefined,
+            afterEachAdLoaded: undefined,
+            afterAllAdsLoaded: undefined,
+            rendered: 0,
+            onloaded: [],
+            adUnits: []
+          }
+        }
+      },
       pos: {
         default: () => { return '' }
       },
@@ -71,9 +109,15 @@
       }
       
     },
+    mounted() {
+      console.log('dfp mounted')
+      if(window && window[ 'googletag' ] && window[ 'googletag' ][ 'apiReady' ]) {
+        // this.defineDfp()
+        googletag.display(this.adunit);
+      }
+    },
     watch: {
-      currPath: function() {
-        // console.log('dfp currPath updated detected!')
+      currPath: function () {
         // if(googletag && googletag.apiReady) {
         //   this.defineDfp()
         // }

@@ -29,7 +29,6 @@
       defineDfp() {
         // let slots = [];
         document.querySelectorAll('.ad-container').forEach((slot) => {
-            // slot.removeAttribute('data-google-query-id')
             const _aduid = slot.getAttribute('id')
             const _pos = slot.getAttribute('pos')
             const _ifSlotVisible = slot.currentStyle ? slot.currentStyle.display : getComputedStyle(slot, null).display;
@@ -110,7 +109,7 @@
           setForceSafeFrame: false,
           noFetch: false,
           namespace: undefined,
-          sizeMapping: [],
+          sizeMapping: undefined,
           afterAdBlocked: undefined,
           afterEachAdLoaded: undefined,
           afterAllAdsLoaded: undefined,
@@ -238,7 +237,6 @@
     },
     watch: {
       currPath: function() {
-        // console.log('currPath updated detected!')
         if(googletag && googletag.apiReady) {
           googletag.destroySlots()
           this.initDfp()
