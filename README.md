@@ -15,8 +15,7 @@ Then, just import it like:
 
 
 Do with following steps in any vue file where you want to put dfp ad:
-
-1、 have `VueDfpProvider` be a component:
+### 1. have `VueDfpProvider` be a component:
 ```javascript
 <script>
   export default {
@@ -31,7 +30,7 @@ Do with following steps in any vue file where you want to put dfp ad:
 </script>
 ```
 
-2、 have to compose an object, its structure looks like:
+### 2、 have to compose an object, its structure looks like:
 ```javascript
 adunits: {
   'section-id': {
@@ -71,7 +70,7 @@ then, put object `adunits` to data:
   }
 ```
 
-3、 do some markups in template:
+### 3、 do some markups in template:
 ```html
 <template>
   <vue-dfp-provider :dfpUnits="dfpUnits" :dfpid="dfpid" :section="sectionId" :options="dfpOptions" >
