@@ -86,7 +86,7 @@
             resolve()
           })
 
-          const useSSL = 'https:' === document.location.protocol
+          const useSSL = document.location.protocol === 'https:'
           gads.src = (useSSL ? 'https:' : 'http:') +
           '//www.googletagservices.com/tag/js/gpt.js'
           const node = document.getElementsByTagName('script')[ 0 ]
