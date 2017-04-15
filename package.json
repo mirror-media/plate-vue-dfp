@@ -5,7 +5,8 @@
   "main": "DfpProvider.vue",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint --ext .js,.vue src ."
+    "lint": "eslint --ext .js,.vue src .",
+    "validate": "npm ls"
   },
   "repository": {
     "type": "git",
@@ -20,10 +21,14 @@
   "devDependencies": {
     "eslint": "^3.19.0",
     "eslint-config-airbnb-base": "^11.1.3",
-    "eslint-plugin-import": "^2.2.0",
     "eslint-config-enough": "^0.2.2",
     "eslint-config-vue": "^2.0.2",
     "eslint-plugin-html": "^1.3.0",
-    "eslint-plugin-vue": "^2.0.1"
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-vue": "^2.0.1",
+    "precommit-hook": "^3.0.0"
   },
+  "pre-commit": [
+    "lint"
+  ]
 }
