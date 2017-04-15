@@ -8,14 +8,17 @@
     'array-bracket-spacing': [ 2, 'always' ],
     'no-underscore-dangle': [0],
     'class-methods-use-this': [2, { 
-      'exceptMethods': [],
+      'exceptMethods': [
+        'getComputedStyle'
+      ],
     }]
   },
   "globals": {
     "document": true,
     "foo": true,
+    "googletag": true,
     "window": true,
     "FileReader": true,
-    "XMLHttpRequest": true
+    "XMLHttpRequest": true,
   }
 }
