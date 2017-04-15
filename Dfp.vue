@@ -35,7 +35,7 @@
             })
             _s.defineSizeMapping(map.build())
         }
-        googletag.display(this.adunit);
+        // googletag.display(this.adunit);
         googletag.pubads().refresh([_s]);
       },
       getDimensions (dimes) {
@@ -103,25 +103,23 @@
         default: () => { return undefined }
       }
     },
-    updated() {
-      if(googletag && googletag.apiReady) {
-        // this.defineDfp()
-      }
-      
-    },
     mounted() {
-      console.log('dfp mounted')
       if(window && window[ 'googletag' ] && window[ 'googletag' ][ 'apiReady' ]) {
-        // this.defineDfp()
+        this.defineDfp()
         googletag.display(this.adunit);
       }
     },
+    updated() {
+      if(window && window[ 'googletag' ] && window[ 'googletag' ][ 'apiReady' ]) {
+        googletag.display(this.adunit);
+      }      
+    },
     watch: {
       currPath: function () {
-        // if(googletag && googletag.apiReady) {
-        //   this.defineDfp()
-        // }
-      }
+        if(googletag && googletag.apiReady) {
+          this.defineDfp()
+        }
+      },
     }
   }
 </script>

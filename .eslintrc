@@ -1,0 +1,21 @@
+{
+  'extends': 'vue',
+  'plugins': [
+        'import'
+  ],
+  'rules': { 
+    'semi': [2, 'never'],
+    'array-bracket-spacing': [ 2, 'always' ],
+    'no-underscore-dangle': [0],
+    'class-methods-use-this': [2, { 
+      'exceptMethods': [],
+    }]
+  },
+  "globals": {
+    "document": true,
+    "foo": true,
+    "window": true,
+    "FileReader": true,
+    "XMLHttpRequest": true
+  }
+}

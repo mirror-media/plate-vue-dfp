@@ -32,6 +32,7 @@
             const _aduid = slot.getAttribute('id')
             const _pos = slot.getAttribute('pos')
             const _ifSlotVisible = slot.currentStyle ? slot.currentStyle.display : getComputedStyle(slot, null).display;
+
             if(_ifSlotVisible === 'none') { return }
             const _s = googletag.defineSlot(`/${this.dfpid}/${_aduid}`
                                   , this.getDimensions(this.dfpUnits[ this.section ][ _pos ][ 'dimensions' ])
@@ -239,15 +240,8 @@
       currPath: function() {
         if(googletag && googletag.apiReady) {
           googletag.destroySlots()
-          this.initDfp()
-          this.defineDfp()
         }
       },
-      section: function() {
-        // googletag.destroySlots()
-        // this.initDfp()
-        // this.defineDfp()
-      }
     },
   }
 </script>
