@@ -4,7 +4,7 @@
 <script>
   export default {
     computed: {
-      adunit() {
+      adunit () {
         return !this.unitId ? this.dfpUnits[ this.section ][ this.pos ][ 'aduid' ] : this.unitId
       },
       className () {
@@ -19,43 +19,43 @@
     },
     name: 'ad-container',
     methods: {
-      defineDfp() {
+      defineDfp () {
         const _s = googletag.defineSlot(`/${this.dfpId}/${this.adunit}`
                               , this.getDimensions(this.dfpUnits[ this.section ][ this.pos ][ 'dimensions' ])
-                              , this.adunit).addService(googletag.pubads());
+                              , this.adunit).addService(googletag.pubads())
         const slot = document.querySelector(`#${this.adunit}`)
-        const _ifSlotVisible = slot ? (slot.currentStyle ? slot.currentStyle.display : getComputedStyle(slot, null).display) : null;
-        if(_ifSlotVisible === 'none') { return }
+        const _ifSlotVisible = slot ? (slot.currentStyle ? slot.currentStyle.display : window.getComputedStyle(slot, null).display) : null
+        if (_ifSlotVisible === 'none') { return }
         const mapping = (this.options[ 'sizeMapping' ] && this.dfpUnits[ this.section ][ this.pos ][ 'size-mapping' ]) ? this.options[ 'sizeMapping' ][ this.dfpUnits[ this.section ][ this.pos ][ 'size-mapping' ] ] : undefined
         if (mapping) {
             // Convert verbose to DFP format
-            let map = googletag.sizeMapping()
-            mapping.forEach((k, v) => {
-              map = map.addSize(k.browser, k.ad_sizes)
-            })
-            _s.defineSizeMapping(map.build())
+          let map = googletag.sizeMapping()
+          mapping.forEach((k, v) => {
+            map = map.addSize(k.browser, k.ad_sizes)
+          })
+          _s.defineSizeMapping(map.build())
         }
-        googletag.display(this.adunit);
-        googletag.pubads().refresh([_s]);
+        // googletag.display(this.adunit);
+        googletag.pubads().refresh([ _s ])
       },
       getDimensions (dimes) {
-        let dimensions = []
+        const dimensions = []
         if (typeof dimes !== 'undefined' && dimes !== '') {
           dimes.split(',').forEach((v) => {
             const dimensionSet = v.split('x')
-            if(dimensionSet.length > 1) {
-              dimensions.push([parseInt(dimensionSet[0], 10), parseInt(dimensionSet[1], 10)])
+            if (dimensionSet.length > 1) {
+              dimensions.push([ parseInt(dimensionSet[ 0 ], 10), parseInt(dimensionSet[ 1 ], 10) ])
             } else {
-              if(dimensionSet[0] === 'fluid') {
+              if (dimensionSet[ 0 ] === 'fluid') {
                 dimensions.push(dimensionSet[0])
               }
             }
           })
         } else {
-          dimensions.push([this.$el.offsetWidth, this.$el.offsetHeight])
+          dimensions.push([ this.$el.offsetWidth, this.$el.offsetHeight ])
         }
         return dimensions
-      },
+      }
     },
     props: {
       extClass: {
@@ -103,24 +103,22 @@
         default: () => { return undefined }
       }
     },
-    updated() {
-      if(googletag && googletag.apiReady) {
-        // this.defineDfp()
+    mounted () {
+      if (window && window[ 'googletag' ] && window[ 'googletag' ][ 'apiReady' ]) {
+        this.defineDfp()
+        googletag.display(this.adunit)
       }
-      
     },
-    mounted() {
-      console.log('dfp mounted')
-      if(window && window[ 'googletag' ] && window[ 'googletag' ][ 'apiReady' ]) {
-        // this.defineDfp()
-        googletag.display(this.adunit);
+    updated () {
+      if (window && window[ 'googletag' ] && window[ 'googletag' ][ 'apiReady' ]) {
+        googletag.display(this.adunit)
       }
     },
     watch: {
       currPath: function () {
-        // if(googletag && googletag.apiReady) {
-        //   this.defineDfp()
-        // }
+        if (googletag && googletag.apiReady) {
+          this.defineDfp()
+        }
       }
     }
   }
