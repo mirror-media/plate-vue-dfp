@@ -20,12 +20,12 @@
     name: 'ad-container',
     methods: {
       defineDfp () {
-        const _s = googletag.defineSlot(`/${this.dfpId}/${this.adunit}`
-                              , this.getDimensions(this.dfpUnits[ this.section ][ this.pos ][ 'dimensions' ])
-                              , this.adunit).addService(googletag.pubads())
         const slot = document.querySelector(`#${this.adunit}`)
         const _ifSlotVisible = slot ? (slot.currentStyle ? slot.currentStyle.display : window.getComputedStyle(slot, null).display) : null
         if (_ifSlotVisible === 'none') { return }
+        const _s = googletag.defineSlot(`/${this.dfpId}/${this.adunit}`
+                              , this.getDimensions(this.dfpUnits[ this.section ][ this.pos ][ 'dimensions' ])
+                              , this.adunit).addService(googletag.pubads())
         const mapping = (this.options[ 'sizeMapping' ] && this.dfpUnits[ this.section ][ this.pos ][ 'size-mapping' ]) ? this.options[ 'sizeMapping' ][ this.dfpUnits[ this.section ][ this.pos ][ 'size-mapping' ] ] : undefined
         if (mapping) {
             // Convert verbose to DFP format
