@@ -197,6 +197,7 @@
           }
           /** https://developers.google.com/doubleclick-gpt/reference#googletag.PubAdsService_disableInitialLoad **/
           if (this.dfpOptions.disableInitialLoad) {
+            /** If set disableInitialLoad() up, have to call refresh() after display(). **/
             pubadsService.disableInitialLoad()
           }
           /** no found in googletag doc **/
@@ -303,12 +304,6 @@
         return
       } else {
         googletag.cmd.push(() => {
-          // for (const slotPos in window.adSlots) {
-          //   if (!window.adSlots[slotPos].displayFlag) {
-          //     googletag.display(window.adSlots[slotPos].adId)
-          //     window.adSlots[slotPos].displayFlag = true
-          //   }
-          // }
           for (const slotPos in window.adSlots) {
             if (!window.adSlots[slotPos].refreshFlag) {
               googletag.pubads().refresh([ window.adSlots[slotPos] ])
