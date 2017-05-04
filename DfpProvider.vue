@@ -125,8 +125,6 @@
             }
             this.dfpIsLoaded = true
             window.dfpIsLoaded = true
-            this.dfpInstalled = true
-            window.dfpInstalled = true
             resolve()
           })
 
@@ -252,7 +250,7 @@
           googletag.cmd.push(() => {
             googletag.destroySlots()
           })
-          // this.dfpInstalled = false
+          // this.dfpInstalled = true
           // window.dfpInstalled = true
           // return
         }
@@ -264,18 +262,24 @@
         googletag.cmd.push(() => {
           for (const slotPos in window.adSlots) {
             if (!window.adSlots[slotPos].displayFlag) {
-              googletag.display(window.adSlots[slotPos].adId)
+              if (this.dfpInstalled !== true) {
+                googletag.display(window.adSlots[slotPos].adId)
+              }
               window.adSlots[slotPos].displayFlag = true
             }
           }
           for (const slotPos in window.adSlots) {
             if (!window.adSlots[slotPos].refreshFlag) {
-              if (this.dfpOptions.disableInitialLoad === true) {
+              if ((this.dfpInstalled === true &&
+                  this.dfpOptions.disableInitialLoad !== true) ||
+                  this.dfpOptions.disableInitialLoad === true) {
                 googletag.pubads().refresh([ window.adSlots[slotPos] ])
               }
               window.adSlots[slotPos].refreshFlag = true
             }
           }
+          this.dfpInstalled = true
+          window.dfpInstalled = true
         })
         this.firstDfpRender = true
       })
