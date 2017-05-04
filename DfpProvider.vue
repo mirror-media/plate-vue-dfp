@@ -21,23 +21,37 @@
       return {
         adsCouldNeverBeInitilized: false,
         dfpIsLoaded: false,
-        installed: false
+        dfpInstalled: false,
+        firstDfpRender: false
       }
     },
     name: 'vue-dfp-provider',
     methods: {
       defineDfp () {
-        // let slots = [];
         document.querySelectorAll('.ad-container').forEach((slot) => {
           const _aduid = slot.getAttribute('id')
           const _pos = slot.getAttribute('pos')
           const _ifSlotVisible = slot.currentStyle ? slot.currentStyle.display : window.getComputedStyle(slot, null).display
 
-          if (_ifSlotVisible === 'none') { return }
+          if (window.adSlots[ _pos ]) {
+            googletag.destroySlots([ window.adSlots[ _pos ] ])
+            googletag.pubads().clear([ window.adSlots[ _pos ] ])
+          }
+
+          if (_ifSlotVisible === 'none') {
+            delete window.adSlots[ _pos ]
+            return
+          }
           const _s = googletag.defineSlot(`/${this.dfpid}/${_aduid}`
                                 , this.getDimensions(this.dfpUnits[ this.section ][ _pos ][ 'dimensions' ])
-                                , _aduid).addService(googletag.pubads())
-          // slots.push(_s)
+                                , _aduid)
+          try {
+            _s.addService(googletag.pubads())
+          } catch (err) {
+            console.log('unabled to render ad', _aduid)
+            console.log('err', err)
+            return
+          }
           const mapping = (this.options[ 'sizeMapping' ] && this.dfpUnits[ this.section ][ _pos ][ 'size-mapping' ]) ? this.options[ 'sizeMapping' ][ this.dfpUnits[ this.section ][ _pos ][ 'size-mapping' ] ] : undefined
           if (mapping) {
             // Convert verbose to DFP format
@@ -47,16 +61,19 @@
             })
             _s.defineSizeMapping(map.build())
           }
-          googletag.display(_aduid)
-          googletag.pubads().refresh([ _s ])
+          window.adSlots[ _pos ] = _s
+          window.adSlots[ _pos ].adId = _aduid
+          window.adSlots[ _pos ].displayFlag = false
+          window.adSlots[ _pos ].refreshFlag = false
         })
-        // googletag.pubads().refresh(slots);
       },
       loadDfp () {
         return new Promise((resolve) => {
           this.dfpIsLoaded = this.dfpIsLoaded || document.querySelectorAll('script[src*="googletagservices.com/tag/js/gpt.js"]').length
           if (this.dfpIsLoaded) {
-            return Promise.resolve()
+            this.dfpInstalled = true
+            window.dfpInstalled = true
+            return resolve()
           }
           window.googletag = window.googletag || {}
           window.googletag.cmd = window.googletag.cmd || []
@@ -78,11 +95,14 @@
           //   resolve()
           // }
           // take https://developers.google.com/doubleclick-gpt/common_implementation_mistakes for ref and revise the above codes to below codes
-          googletag.cmd.push(function () {
+          googletag.cmd.push(() => {
             if (!googletag._loadStarted_) {
               googletag._adBlocked_ = true
             }
             this.dfpIsLoaded = true
+            window.dfpIsLoaded = true
+            this.dfpInstalled = true
+            window.dfpInstalled = true
             resolve()
           })
 
@@ -207,20 +227,48 @@
           dimensions.push([ this.$el.offsetWidth, this.$el.offsetHeight ])
         }
         return dimensions
+      },
+      removeDfp () {
+        for (const slotPos in window.adSlots) {
+          googletag.destroySlots([ window.adSlots[ slotPos ] ])
+          document.querySelector(`#${window.adSlots[slotPos].adId}`).innerHtml = ''
+        }
+        window.adSlots = {}
+        document.querySelector('head').removeChild(document.querySelector('script[src*="googletagservices.com/tag/js/gpt.js"]'))
+        delete window.googletag
+        this.dfpInstalled = false
+        this.dfpIsLoaded = false
+        window.dfpInstalled = false
+        window.dfpIsLoaded = false
       }
     },
     mounted () {
       this.loadDfp().then(() => {
+        if (this.dfpInstalled === true) {
+          googletag.destroySlots()
+          // this.dfpInstalled = false
+          // window.dfpInstalled = true
+          // return
+        }
+        if (!window.adSlots) {
+          window.adSlots = {}
+        }
         this.initDfp()
         this.defineDfp()
+        for (const slotPos in window.adSlots) {
+          if (!window.adSlots[slotPos].displayFlag) {
+            googletag.display(window.adSlots[slotPos].adId)
+            window.adSlots[slotPos].displayFlag = true
+          }
+        }
+        for (const slotPos in window.adSlots) {
+          if (!window.adSlots[slotPos].refreshFlag) {
+            googletag.pubads().refresh([ window.adSlots[slotPos] ])
+            window.adSlots[slotPos].refreshFlag = true
+          }
+        }
+        this.firstDfpRender = true
       })
-      document.addEventListener('DOMContentLoaded', () => {})
-      if (googletag && googletag.apiReady) {
-        googletag.destroySlots()
-        // googletag.pubads().clear();
-        this.initDfp()
-        this.defineDfp()
-      }
     },
     props: {
       dfpid: {
@@ -238,8 +286,24 @@
     },
     watch: {
       currPath: function () {
-        if (googletag && googletag.apiReady) {
-          googletag.destroySlots()
+        googletag.destroySlots()
+      }
+    },
+    updated () {
+      if (this.dfpInstalled !== true || this.firstDfpRender !== true) {
+        return
+      } else {
+        for (const slotPos in window.adSlots) {
+          if (!window.adSlots[slotPos].displayFlag) {
+            googletag.display(window.adSlots[slotPos].adId)
+            window.adSlots[slotPos].displayFlag = true
+          }
+        }
+        for (const slotPos in window.adSlots) {
+          if (!window.adSlots[slotPos].refreshFlag) {
+            googletag.pubads().refresh([ window.adSlots[slotPos] ])
+            window.adSlots[slotPos].refreshFlag = true
+          }
         }
       }
     }
