@@ -22,49 +22,73 @@
         adsCouldNeverBeInitilized: false,
         dfpIsLoaded: false,
         dfpInstalled: false,
+        dfpOptions: {
+          dfpID: '',
+          setTargeting: {},
+          setCategoryExclusion: '',
+          setLocation: '',
+          enableSingleRequest: true,
+          collapseEmptyDivs: 'original',
+          refreshExisting: true,
+          disablePublisherConsole: false,
+          disableInitialLoad: true,
+          setCentering: false,
+          setForceSafeFrame: false,
+          noFetch: false,
+          namespace: undefined,
+          sizeMapping: undefined,
+          afterAdBlocked: undefined,
+          afterEachAdLoaded: undefined,
+          afterAllAdsLoaded: undefined,
+          rendered: 0,
+          onloaded: [],
+          adUnits: []
+        },
         firstDfpRender: false
       }
     },
     name: 'vue-dfp-provider',
     methods: {
       defineDfp () {
-        document.querySelectorAll('.ad-container').forEach((slot) => {
-          const _aduid = slot.getAttribute('id')
-          const _pos = slot.getAttribute('pos')
-          const _ifSlotVisible = slot.currentStyle ? slot.currentStyle.display : window.getComputedStyle(slot, null).display
+        googletag.cmd.push(() => {
+          document.querySelectorAll('.ad-container').forEach((slot) => {
+            const _aduid = slot.getAttribute('id')
+            const _pos = slot.getAttribute('pos')
+            const _ifSlotVisible = slot.currentStyle ? slot.currentStyle.display : window.getComputedStyle(slot, null).display
 
-          if (window.adSlots[ _pos ]) {
-            googletag.destroySlots([ window.adSlots[ _pos ] ])
-            googletag.pubads().clear([ window.adSlots[ _pos ] ])
-          }
+            if (window.adSlots[ _pos ]) {
+              googletag.destroySlots([ window.adSlots[ _pos ] ])
+              googletag.pubads().clear([ window.adSlots[ _pos ] ])
+            }
 
-          if (_ifSlotVisible === 'none') {
-            delete window.adSlots[ _pos ]
-            return
-          }
-          const _s = googletag.defineSlot(`/${this.dfpid}/${_aduid}`
-                                , this.getDimensions(this.dfpUnits[ this.section ][ _pos ][ 'dimensions' ])
-                                , _aduid)
-          try {
-            _s.addService(googletag.pubads())
-          } catch (err) {
-            console.log('unabled to render ad', _aduid)
-            console.log('err', err)
-            return
-          }
-          const mapping = (this.options[ 'sizeMapping' ] && this.dfpUnits[ this.section ][ _pos ][ 'size-mapping' ]) ? this.options[ 'sizeMapping' ][ this.dfpUnits[ this.section ][ _pos ][ 'size-mapping' ] ] : undefined
-          if (mapping) {
-            // Convert verbose to DFP format
-            let map = googletag.sizeMapping()
-            mapping.forEach((k, v) => {
-              map = map.addSize(k.browser, k.ad_sizes)
-            })
-            _s.defineSizeMapping(map.build())
-          }
-          window.adSlots[ _pos ] = _s
-          window.adSlots[ _pos ].adId = _aduid
-          window.adSlots[ _pos ].displayFlag = false
-          window.adSlots[ _pos ].refreshFlag = false
+            if (_ifSlotVisible === 'none') {
+              delete window.adSlots[ _pos ]
+              return
+            }
+            const _s = googletag.defineSlot(`/${this.dfpid}/${_aduid}`
+                                  , this.getDimensions(this.dfpUnits[ this.section ][ _pos ][ 'dimensions' ])
+                                  , _aduid)
+            try {
+              _s.addService(googletag.pubads())
+            } catch (err) {
+              console.log('unabled to render ad', _aduid)
+              console.log('err', err)
+              return
+            }
+            const mapping = (this.options[ 'sizeMapping' ] && this.dfpUnits[ this.section ][ _pos ][ 'size-mapping' ]) ? this.options[ 'sizeMapping' ][ this.dfpUnits[ this.section ][ _pos ][ 'size-mapping' ] ] : undefined
+            if (mapping) {
+              // Convert verbose to DFP format
+              let map = googletag.sizeMapping()
+              mapping.forEach((k, v) => {
+                map = map.addSize(k.browser, k.ad_sizes)
+              })
+              _s.defineSizeMapping(map.build())
+            }
+            window.adSlots[ _pos ] = _s
+            window.adSlots[ _pos ].adId = _aduid
+            window.adSlots[ _pos ].displayFlag = false
+            window.adSlots[ _pos ].refreshFlag = false
+          })
         })
       },
       loadDfp () {
@@ -116,47 +140,26 @@
       initDfp () {
         window.googletag = window.googletag || {}
         googletag.cmd = googletag.cmd || []
-        const dfpOptions = Object.assign({
-          dfpID: '',
-          setTargeting: {},
-          setCategoryExclusion: '',
-          setLocation: '',
-          enableSingleRequest: true,
-          collapseEmptyDivs: 'original',
-          refreshExisting: true,
-          disablePublisherConsole: false,
-          disableInitialLoad: true,
-          setCentering: false,
-          setForceSafeFrame: false,
-          noFetch: false,
-          namespace: undefined,
-          sizeMapping: undefined,
-          afterAdBlocked: undefined,
-          afterEachAdLoaded: undefined,
-          afterAllAdsLoaded: undefined,
-          rendered: 0,
-          onloaded: [],
-          adUnits: []
-        }, this.options)
+        this.dfpOptions = Object.assign(this.dfpOptions, this.options)
 
-        googletag.cmd.push(function () {
+        googletag.cmd.push(() => {
           const pubadsService = googletag.pubads()
           /** https://developers.google.com/doubleclick-gpt/reference#googletag.pubads **/
 
-          if (dfpOptions.setForceSafeFrame) {
+          if (this.dfpOptions.setForceSafeFrame) {
             pubadsService.setForceSafeFrame(true)
           }
 
           /** https://developers.google.com/doubleclick-gpt/reference#googletag.PubAdsService_enableSingleRequest **/
-          if (dfpOptions.enableSingleRequest) {
+          if (this.dfpOptions.enableSingleRequest) {
             pubadsService.enableSingleRequest()
           }
           /** https://developers.google.com/doubleclick-gpt/reference#googletag.PubAdsService_setTargeting **/
-          for (const x in dfpOptions.setTargeting) {
-            pubadsService.setTargeting(x, dfpOptions.setTargeting[x])
+          for (const x in this.dfpOptions.setTargeting) {
+            pubadsService.setTargeting(x, this.dfpOptions.setTargeting[x])
           }
           /** https://developers.google.com/doubleclick-gpt/reference#googletag.PubAdsService_setLocation **/
-          const setLocation = dfpOptions.setLocation
+          const setLocation = this.dfpOptions.setLocation
           if (typeof setLocation === 'object') {
             if (typeof setLocation.latitude === 'number' && typeof setLocation.longitude === 'number' &&
               typeof setLocation.precision === 'number') {
@@ -166,8 +169,8 @@
             }
           }
           /** https://developers.google.com/doubleclick-gpt/reference#googletag.PubAdsService_setCategoryExclusion **/
-          if (dfpOptions.setCategoryExclusion.length > 0) {
-            const exclusionsGroup = dfpOptions.setCategoryExclusion.split(',')
+          if (this.dfpOptions.setCategoryExclusion.length > 0) {
+            const exclusionsGroup = this.dfpOptions.setCategoryExclusion.split(',')
             let valueTrimmed
             exclusionsGroup.forEach((v) => {
               valueTrimmed = v.trim()
@@ -177,35 +180,35 @@
             })
           }
           /** https://developers.google.com/doubleclick-gpt/reference#googletag.PubAdsService_collapseEmptyDivs **/
-          if (dfpOptions.collapseEmptyDivs) {
+          if (this.dfpOptions.collapseEmptyDivs) {
             pubadsService.collapseEmptyDivs()
           }
           /** https://developers.google.com/doubleclick-gpt/reference#googletag.disablePublisherConsole **/
-          if (dfpOptions.disablePublisherConsole) {
+          if (this.dfpOptions.disablePublisherConsole) {
             pubadsService.disablePublisherConsole()
           }
           /** https://developers.google.com/doubleclick-gpt/reference#googletag.CompanionAdsService_setRefreshUnfilledSlots **/
-          if (dfpOptions.companionAds) {
+          if (this.dfpOptions.companionAds) {
             googletag.companionAds().setRefreshUnfilledSlots(true)
             /** https://developers.google.com/doubleclick-gpt/reference#googletag.PubAdsService_enableVideoAds **/
-            if (!dfpOptions.disableInitialLoad) {
+            if (!this.dfpOptions.disableInitialLoad) {
               pubadsService.enableVideoAds()
             }
           }
           /** https://developers.google.com/doubleclick-gpt/reference#googletag.PubAdsService_disableInitialLoad **/
-          if (dfpOptions.disableInitialLoad) {
+          if (this.dfpOptions.disableInitialLoad) {
             pubadsService.disableInitialLoad()
           }
           /** no found in googletag doc **/
-          if (dfpOptions.noFetch) {
+          if (this.dfpOptions.noFetch) {
             // pubadsService.noFetch()
           }
           /** https://developers.google.com/doubleclick-gpt/reference#googletag.PubAdsService_setCentering **/
-          if (dfpOptions.setCentering) {
+          if (this.dfpOptions.setCentering) {
             pubadsService.setCentering(true)
           }
-          if (dfpOptions[ 'afterEachAdLoaded' ]) {
-            googletag.pubads().addEventListener('slotRenderEnded', dfpOptions[ 'afterEachAdLoaded' ])
+          if (this.dfpOptions[ 'afterEachAdLoaded' ]) {
+            googletag.pubads().addEventListener('slotRenderEnded', this.dfpOptions[ 'afterEachAdLoaded' ])
           }
           googletag.enableServices()
         })
@@ -245,7 +248,9 @@
     mounted () {
       this.loadDfp().then(() => {
         if (this.dfpInstalled === true) {
-          googletag.destroySlots()
+          googletag.cmd.push(() => {
+            googletag.destroySlots()
+          })
           // this.dfpInstalled = false
           // window.dfpInstalled = true
           // return
@@ -255,18 +260,22 @@
         }
         this.initDfp()
         this.defineDfp()
-        for (const slotPos in window.adSlots) {
-          if (!window.adSlots[slotPos].displayFlag) {
-            googletag.display(window.adSlots[slotPos].adId)
-            window.adSlots[slotPos].displayFlag = true
+        googletag.cmd.push(() => {
+          for (const slotPos in window.adSlots) {
+            if (!window.adSlots[slotPos].displayFlag) {
+              googletag.display(window.adSlots[slotPos].adId)
+              window.adSlots[slotPos].displayFlag = true
+            }
           }
-        }
-        for (const slotPos in window.adSlots) {
-          if (!window.adSlots[slotPos].refreshFlag) {
-            googletag.pubads().refresh([ window.adSlots[slotPos] ])
-            window.adSlots[slotPos].refreshFlag = true
+          for (const slotPos in window.adSlots) {
+            if (!window.adSlots[slotPos].refreshFlag) {
+              if (this.dfpOptions.disableInitialLoad === true) {
+                googletag.pubads().refresh([ window.adSlots[slotPos] ])
+              }
+              window.adSlots[slotPos].refreshFlag = true
+            }
           }
-        }
+        })
         this.firstDfpRender = true
       })
     },
@@ -293,18 +302,20 @@
       if (this.dfpInstalled !== true || this.firstDfpRender !== true) {
         return
       } else {
-        for (const slotPos in window.adSlots) {
-          if (!window.adSlots[slotPos].displayFlag) {
-            googletag.display(window.adSlots[slotPos].adId)
-            window.adSlots[slotPos].displayFlag = true
+        googletag.cmd.push(() => {
+          // for (const slotPos in window.adSlots) {
+          //   if (!window.adSlots[slotPos].displayFlag) {
+          //     googletag.display(window.adSlots[slotPos].adId)
+          //     window.adSlots[slotPos].displayFlag = true
+          //   }
+          // }
+          for (const slotPos in window.adSlots) {
+            if (!window.adSlots[slotPos].refreshFlag) {
+              googletag.pubads().refresh([ window.adSlots[slotPos] ])
+              window.adSlots[slotPos].refreshFlag = true
+            }
           }
-        }
-        for (const slotPos in window.adSlots) {
-          if (!window.adSlots[slotPos].refreshFlag) {
-            googletag.pubads().refresh([ window.adSlots[slotPos] ])
-            window.adSlots[slotPos].refreshFlag = true
-          }
-        }
+        })
       }
     }
   }
