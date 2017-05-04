@@ -126,7 +126,6 @@
       }
     },
     mounted () {
-      console.log('DFP############VUE MOUNTED###########', Date.now(), this.adunit)
       if (window && window[ 'googletag' ] && window[ 'googletag' ][ 'apiReady' ]) {
         this.defineDfp()
       }
