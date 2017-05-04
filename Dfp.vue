@@ -20,45 +20,47 @@
     name: 'ad-container',
     methods: {
       defineDfp () {
-        if (window.adSlots[ this.pos ]) {
-          googletag.destroySlots([ window.adSlots[ this.pos ] ])
-          googletag.pubads().clear([ window.adSlots[ this.pos ] ])
-        }
-        const slot = document.querySelector(`#${this.adunit}`)
-        if (slot) {
-          slot.removeAttribute('style')
-          slot.innerHtml = ''
-        }
-        const _ifSlotVisible = slot ? (slot.currentStyle ? slot.currentStyle.display : window.getComputedStyle(slot, null).display) : null
-        if (_ifSlotVisible === 'none') {
-          delete window.adSlots[ this.pos ]
-          return
-        }
-        const _s = googletag.defineSlot(`/${this.dfpId}/${this.adunit}`
-                    , this.getDimensions(this.dfpUnits[ this.section ][ this.pos ][ 'dimensions' ])
-                    , this.adunit)
-        try {
-          _s.addService(googletag.pubads())
-        } catch (err) {
-          console.log('unabled to render ad', this.adunit)
-          console.log('err', err)
-          return
-        }
-        const mapping = (this.options[ 'sizeMapping' ] && this.dfpUnits[ this.section ][ this.pos ][ 'size-mapping' ]) ? this.options[ 'sizeMapping' ][ this.dfpUnits[ this.section ][ this.pos ][ 'size-mapping' ] ] : undefined
-        if (mapping) {
-          // Convert verbose to DFP format
-          let map = googletag.sizeMapping()
-          mapping.forEach((k, v) => {
-            map = map.addSize(k.browser, k.ad_sizes)
-          })
-          _s.defineSizeMapping(map.build())
-        }
-        // googletag.display(this.adunit)
-        // googletag.pubads().refresh([ _s ])
-        window.adSlots[ this.pos ] = _s
-        window.adSlots[ this.pos ].adId = this.adunit
-        window.adSlots[ this.pos ].displayFlag = false
-        window.adSlots[ this.pos ].refreshFlag = false
+        googletag.cmd.push(() => {
+          if (window.adSlots[ this.pos ]) {
+            googletag.destroySlots([ window.adSlots[ this.pos ] ])
+            googletag.pubads().clear([ window.adSlots[ this.pos ] ])
+          }
+          const slot = document.querySelector(`#${this.adunit}`)
+          if (slot) {
+            slot.removeAttribute('style')
+            slot.innerHtml = ''
+          }
+          const _ifSlotVisible = slot ? (slot.currentStyle ? slot.currentStyle.display : window.getComputedStyle(slot, null).display) : null
+          if (_ifSlotVisible === 'none') {
+            delete window.adSlots[ this.pos ]
+            return
+          }
+          const _s = googletag.defineSlot(`/${this.dfpId}/${this.adunit}`
+                      , this.getDimensions(this.dfpUnits[ this.section ][ this.pos ][ 'dimensions' ])
+                      , this.adunit)
+          try {
+            _s.addService(googletag.pubads())
+          } catch (err) {
+            console.log('unabled to render ad', this.adunit)
+            console.log('err', err)
+            return
+          }
+          const mapping = (this.options[ 'sizeMapping' ] && this.dfpUnits[ this.section ][ this.pos ][ 'size-mapping' ]) ? this.options[ 'sizeMapping' ][ this.dfpUnits[ this.section ][ this.pos ][ 'size-mapping' ] ] : undefined
+          if (mapping) {
+            // Convert verbose to DFP format
+            let map = googletag.sizeMapping()
+            mapping.forEach((k, v) => {
+              map = map.addSize(k.browser, k.ad_sizes)
+            })
+            _s.defineSizeMapping(map.build())
+          }
+          // googletag.display(this.adunit)
+          // googletag.pubads().refresh([ _s ])
+          window.adSlots[ this.pos ] = _s
+          window.adSlots[ this.pos ].adId = this.adunit
+          window.adSlots[ this.pos ].displayFlag = false
+          window.adSlots[ this.pos ].refreshFlag = false
+        })
       },
       getDimensions (dimes) {
         const dimensions = []
