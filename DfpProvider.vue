@@ -1,6 +1,11 @@
 <template>
   <div>
-    <slot name="dfpPos" :vueDfp="dfpPos" :dfpUnits="dfpUnits" :section="section" :dfpId="dfpid"></slot>
+    <slot name="dfpPos" 
+          :vueDfp="dfpPos" 
+          :dfpUnits="dfpUnits" 
+          :section="section" 
+          :dfpId="dfpid"
+          :config="config"></slot>
   </div>
 </template>
 <script>
@@ -12,6 +17,15 @@
     computed: {
       currPath () {
         return this.$route.fullPath
+      },
+      config () {
+        return {
+          vueDfp: this.dfpPos,
+          dfpUnits: this.dfpUnits,
+          section: this.section,
+          dfpId: this.dfpid,
+          mode: this.mode
+        }
       },
       dfpPos () {
         return VueDfp
@@ -296,6 +310,9 @@
       },
       section: {
         default: () => { return 'default' }
+      },
+      mode: {
+        default: () => { return 'prod' }
       }
     },
     watch: {

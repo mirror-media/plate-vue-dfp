@@ -5,16 +5,32 @@
   export default {
     computed: {
       adunit () {
-        return !this.unitId ? this.dfpUnits[ this.section ][ this.pos ][ 'aduid' ] : this.unitId
+        let _unitId = !this.unitId ? this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'aduid' ] : this.unitId
+        if (this.ifDevMode) {
+          _unitId = `test_${_unitId}`
+        }
+        return _unitId
       },
       className () {
-        return this.dfpUnits[ this.section ][ this.pos ][ 'cont-class' ].join(' ')
+        return this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'cont-class' ].join(' ')
       },
       currPath () {
         return this.$route.fullPath
       },
+      currConfig () {
+        return Object.assign({
+          dfpUnits: this.dfpUnits,
+          section: this.section,
+          dfpId: this.dfpId,
+          mode: this.mode,
+          options: this.options
+        }, this.config)
+      },
+      ifDevMode () {
+        return this.config.mode === 'dev'
+      },
       style () {
-        return this.dfpUnits[ this.section ][ this.pos ][ 'cont-style' ].join(';')
+        return this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'cont-style' ].join(';')
       }
     },
     name: 'ad-container',
@@ -35,8 +51,8 @@
             delete window.adSlots[ this.pos ]
             return
           }
-          const _s = googletag.defineSlot(`/${this.dfpId}/${this.adunit}`
-                      , this.getDimensions(this.dfpUnits[ this.section ][ this.pos ][ 'dimensions' ])
+          const _s = googletag.defineSlot(`/${this.currConfig.dfpId}/${this.adunit}`
+                      , this.getDimensions(this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'dimensions' ])
                       , this.adunit)
           try {
             _s.addService(googletag.pubads())
@@ -45,7 +61,7 @@
             console.log('err', err)
             return
           }
-          const mapping = (this.options[ 'sizeMapping' ] && this.dfpUnits[ this.section ][ this.pos ][ 'size-mapping' ]) ? this.options[ 'sizeMapping' ][ this.dfpUnits[ this.section ][ this.pos ][ 'size-mapping' ] ] : undefined
+          const mapping = (this.currConfig.options[ 'sizeMapping' ] && this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'size-mapping' ]) ? this.currConfig.options[ 'sizeMapping' ][ this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'size-mapping' ] ] : undefined
           if (mapping) {
             // Convert verbose to DFP format
             let map = googletag.sizeMapping()
@@ -125,6 +141,16 @@
       },
       unitId: {
         default: () => { return undefined }
+      },
+      mode: {
+        default: () => { return 'prod' }
+      },
+      config: {
+        default: () => {
+          return {
+            mode: 'prod'
+          }
+        }
       }
     },
     mounted () {
