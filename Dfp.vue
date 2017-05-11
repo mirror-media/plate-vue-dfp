@@ -177,4 +177,5 @@
   .ad-container.margin-top-30px { margin-top: 30px; }
   .ad-container.margin-top-0 { margin-top: 0; }
   .ad-container.center { display: flex; justify-content: center; margin-right: auto; margin-left: auto; }  
+  .ad-container > div { width: 100%; }
 </style>
