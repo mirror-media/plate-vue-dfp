@@ -226,6 +226,10 @@
           googletag.enableServices()
         })
       },
+      ifClient () {
+        const browser = typeof window !== 'undefined'
+        return browser
+      },
       getDimensions (dimes) {
         const dimensions = []
         if (typeof dimes !== 'undefined' && dimes !== '') {
@@ -317,7 +321,7 @@
     },
     watch: {
       currPath: function () {
-        if (window && window[ 'googletag' ] && window[ 'googletag' ][ 'apiReady' ]) {
+        if (this.ifClient() && window && window[ 'googletag' ] && window[ 'googletag' ][ 'apiReady' ]) {
           googletag.destroySlots()
         }
       }
