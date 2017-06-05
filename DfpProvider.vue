@@ -317,7 +317,9 @@
     },
     watch: {
       currPath: function () {
-        googletag.destroySlots()
+        if (window && window[ 'googletag' ] && window[ 'googletag' ][ 'apiReady' ]) {
+          googletag.destroySlots()
+        }
       }
     },
     updated () {
