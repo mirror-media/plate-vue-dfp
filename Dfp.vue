@@ -95,6 +95,10 @@
           dimensions.push([ this.$el.offsetWidth, this.$el.offsetHeight ])
         }
         return dimensions
+      },
+      ifClient () {
+        const browser = typeof window !== 'undefined'
+        return browser
       }
     },
     props: {
@@ -165,7 +169,7 @@
     },
     watch: {
       currPath: function () {
-        if (window && window[ 'googletag' ] && window[ 'googletag' ][ 'apiReady' ]) {
+        if (this.ifClient() && window && window[ 'googletag' ] && window[ 'googletag' ][ 'apiReady' ]) {
           this.defineDfp()
         }
       }
