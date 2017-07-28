@@ -28,9 +28,11 @@
       },
       ifDevMode () {
         return this.config.mode === 'dev'
-      },
-      style () {
-        return this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'cont-style' ].join(';')
+      }
+    },
+    data () {
+      return {
+        style: ''
       }
     },
     name: 'ad-container',
@@ -45,6 +47,7 @@
           if (slot) {
             slot.removeAttribute('style')
             slot.innerHtml = ''
+            slot.setAttribute('style', this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'cont-style' ].join(';'))
           }
           const _ifSlotVisible = slot ? (slot.currentStyle ? slot.currentStyle.display : window.getComputedStyle(slot, null).display) : null
           if (_ifSlotVisible === 'none') {
@@ -100,6 +103,9 @@
         const browser = typeof window !== 'undefined'
         return browser
       }
+      // style () {
+      //   return this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'cont-style' ].join(';')
+      // }
     },
     props: {
       extClass: {
@@ -161,6 +167,7 @@
       if (window && window[ 'googletag' ] && window[ 'googletag' ][ 'apiReady' ]) {
         this.defineDfp()
       }
+      this.style = this.currConfig && this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'cont-style' ].join(';')
     },
     updated () {
       if (window && window[ 'googletag' ] && window[ 'googletag' ][ 'apiReady' ]) {
