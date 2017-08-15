@@ -54,9 +54,19 @@
             delete window.adSlots[ this.pos ]
             return
           }
-          const _s = googletag.defineSlot(`/${this.currConfig.dfpId}/${this.adunit}`
+
+          const isOutOfPage = this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ].outOfPage
+          let _s = {}
+          if (!isOutOfPage) {
+            _s = googletag.defineSlot(`/${this.currConfig.dfpId}/${this.adunit}`
                       , this.getDimensions(this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'dimensions' ])
                       , this.adunit)
+          } else {
+            console.log('##### OOP DETECTED #####')
+            _s = googletag.defineOutOfPageSlot(`/${this.currConfig.dfpId}/${this.adunit}`
+                                  , this.adunit)
+          }
+
           try {
             _s.addService(googletag.pubads())
           } catch (err) {
