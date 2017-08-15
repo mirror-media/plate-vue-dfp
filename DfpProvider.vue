@@ -41,6 +41,7 @@
           setTargeting: {},
           setCategoryExclusion: '',
           setLocation: '',
+          enableSyncRendering: false,
           enableSingleRequest: true,
           collapseEmptyDivs: 'original',
           refreshExisting: true,
@@ -79,9 +80,18 @@
               delete window.adSlots[ _pos ]
               return
             }
-            const _s = googletag.defineSlot(`/${this.dfpid}/${_aduid}`
-                                  , this.getDimensions(this.dfpUnits[ this.section ][ _pos ][ 'dimensions' ])
-                                  , _aduid)
+
+            const isOutOfPage = this.dfpUnits[ this.section ][ _pos ].outOfPage
+            let _s = {}
+            if (!isOutOfPage) {
+              _s = googletag.defineSlot(`/${this.dfpid}/${_aduid}`
+                                    , this.getDimensions(this.dfpUnits[ this.section ][ _pos ][ 'dimensions' ])
+                                    , _aduid)
+            } else {
+              console.log('out of page detected')
+              _s = googletag.defineOutOfPageSlot(`/${this.dfpid}/${_aduid}`, _aduid)
+            }
+
             try {
               _s.addService(googletag.pubads())
             } catch (err) {
@@ -160,6 +170,10 @@
 
           if (this.dfpOptions.setForceSafeFrame) {
             pubadsService.setForceSafeFrame(true)
+          }
+
+          if (this.dfpOptions.enableSyncRendering) {
+            pubadsService.enableSyncRendering()
           }
 
           /** https://developers.google.com/doubleclick-gpt/reference#googletag.PubAdsService_enableSingleRequest **/

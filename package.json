@@ -1,6 +1,6 @@
 {
   "name": "plate-vue-dfp",
-  "version": "1.2.63",
+  "version": "1.2.64-alpha.1",
   "description": "A package for google dfp in framwork vue.",
   "main": "DfpProvider.vue",
   "scripts": {
