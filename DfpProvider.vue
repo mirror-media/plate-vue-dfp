@@ -173,6 +173,7 @@
           }
 
           if (this.dfpOptions.enableSyncRendering) {
+            console.log('set enableSyncRendering')
             pubadsService.enableSyncRendering()
           }
 
