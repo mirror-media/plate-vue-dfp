@@ -88,7 +88,7 @@
                                     , this.getDimensions(this.dfpUnits[ this.section ][ _pos ][ 'dimensions' ])
                                     , _aduid)
             } else {
-              console.log('out of page detected')
+              console.log('##### OOP DETECTED #####')
               _s = googletag.defineOutOfPageSlot(`/${this.dfpid}/${_aduid}`, _aduid)
             }
 
@@ -173,7 +173,6 @@
           }
 
           if (this.dfpOptions.enableSyncRendering) {
-            console.log('set enableSyncRendering')
             pubadsService.enableSyncRendering()
           }
 

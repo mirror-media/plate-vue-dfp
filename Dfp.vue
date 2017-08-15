@@ -62,7 +62,7 @@
                       , this.getDimensions(this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'dimensions' ])
                       , this.adunit)
           } else {
-            console.log('out of page detected')
+            console.log('##### OOP DETECTED #####')
             _s = googletag.defineOutOfPageSlot(`/${this.currConfig.dfpId}/${this.adunit}`
                                   , this.adunit)
           }
