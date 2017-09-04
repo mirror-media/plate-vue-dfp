@@ -66,7 +66,8 @@
     methods: {
       defineDfp () {
         googletag.cmd.push(() => {
-          document.querySelectorAll('.ad-container').forEach((slot) => {
+          const adContainers = [ ...document.querySelectorAll('.ad-container') ]
+          adContainers.forEach((slot) => {
             const _aduid = slot.getAttribute('id')
             const _pos = slot.getAttribute('pos')
             const _ifSlotVisible = slot.currentStyle ? slot.currentStyle.display : window.getComputedStyle(slot, null).display
