@@ -61,31 +61,32 @@
             _s = googletag.defineSlot(`/${this.currConfig.dfpId}/${this.adunit}`
                       , this.getDimensions(this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'dimensions' ])
                       , this.adunit)
+            try {
+              _s.addService(googletag.pubads())
+            } catch (err) {
+              console.log('unabled to render ad', this.adunit)
+              console.log('err', err)
+              return
+            }
+            const mapping = (this.currConfig.options[ 'sizeMapping' ] && this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'size-mapping' ]) ? this.currConfig.options[ 'sizeMapping' ][ this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'size-mapping' ] ] : undefined
+            if (mapping) {
+              // Convert verbose to DFP format
+              let map = googletag.sizeMapping()
+              mapping.forEach((k, v) => {
+                map = map.addSize(k.browser, k.ad_sizes)
+              })
+              _s.defineSizeMapping(map.build())
+            }
+            window.adSlots[ this.pos ] = _s
           } else {
             console.log('##### OOP DETECTED #####')
-            _s = googletag.defineOutOfPageSlot(`/${this.currConfig.dfpId}/${this.adunit}`
-                                  , this.adunit)
+            // _s = googletag.defineOutOfPageSlot(`/${this.currConfig.dfpId}/${this.adunit}`
+            //                       , this.adunit)
+            _s = googletag.pubads().defineOutOfPagePassback(`/${this.currConfig.dfpId}/${this.adunit}`)
+            window.adSlots[ this.pos ] = _s
+            window.adSlots[ this.pos ].isOutOfPage = true
           }
 
-          try {
-            _s.addService(googletag.pubads())
-          } catch (err) {
-            console.log('unabled to render ad', this.adunit)
-            console.log('err', err)
-            return
-          }
-          const mapping = (this.currConfig.options[ 'sizeMapping' ] && this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'size-mapping' ]) ? this.currConfig.options[ 'sizeMapping' ][ this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'size-mapping' ] ] : undefined
-          if (mapping) {
-            // Convert verbose to DFP format
-            let map = googletag.sizeMapping()
-            mapping.forEach((k, v) => {
-              map = map.addSize(k.browser, k.ad_sizes)
-            })
-            _s.defineSizeMapping(map.build())
-          }
-          // googletag.display(this.adunit)
-          // googletag.pubads().refresh([ _s ])
-          window.adSlots[ this.pos ] = _s
           window.adSlots[ this.pos ].adId = this.adunit
           window.adSlots[ this.pos ].displayFlag = false
           window.adSlots[ this.pos ].refreshFlag = false
