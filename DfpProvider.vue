@@ -88,28 +88,31 @@
               _s = googletag.defineSlot(`/${this.dfpid}/${_aduid}`
                                     , this.getDimensions(this.dfpUnits[ this.section ][ _pos ][ 'dimensions' ])
                                     , _aduid)
+              try {
+                _s.addService(googletag.pubads())
+              } catch (err) {
+                console.log('unabled to render ad', _aduid)
+                console.log('err', err)
+                return
+              }
+              const mapping = (this.options[ 'sizeMapping' ] && this.dfpUnits[ this.section ][ _pos ][ 'size-mapping' ]) ? this.options[ 'sizeMapping' ][ this.dfpUnits[ this.section ][ _pos ][ 'size-mapping' ] ] : undefined
+              if (mapping) {
+                // Convert verbose to DFP format
+                let map = googletag.sizeMapping()
+                mapping.forEach((k, v) => {
+                  map = map.addSize(k.browser, k.ad_sizes)
+                })
+                _s.defineSizeMapping(map.build())
+              }
+              window.adSlots[ _pos ] = _s
             } else {
               console.log('##### OOP DETECTED #####')
-              _s = googletag.defineOutOfPageSlot(`/${this.dfpid}/${_aduid}`, _aduid)
+              // _s = googletag.defineOutOfPageSlot(`/${this.dfpid}/${_aduid}`, _aduid)
+              _s = googletag.pubads().defineOutOfPagePassback(`/${this.dfpid}/${_aduid}`)
+              window.adSlots[ _pos ] = _s
+              window.adSlots[ _pos ].isOutOfPage = true
             }
 
-            try {
-              _s.addService(googletag.pubads())
-            } catch (err) {
-              console.log('unabled to render ad', _aduid)
-              console.log('err', err)
-              return
-            }
-            const mapping = (this.options[ 'sizeMapping' ] && this.dfpUnits[ this.section ][ _pos ][ 'size-mapping' ]) ? this.options[ 'sizeMapping' ][ this.dfpUnits[ this.section ][ _pos ][ 'size-mapping' ] ] : undefined
-            if (mapping) {
-              // Convert verbose to DFP format
-              let map = googletag.sizeMapping()
-              mapping.forEach((k, v) => {
-                map = map.addSize(k.browser, k.ad_sizes)
-              })
-              _s.defineSizeMapping(map.build())
-            }
-            window.adSlots[ _pos ] = _s
             window.adSlots[ _pos ].adId = _aduid
             window.adSlots[ _pos ].displayFlag = false
             window.adSlots[ _pos ].refreshFlag = false
@@ -348,7 +351,11 @@
         googletag.cmd.push(() => {
           for (const slotPos in window.adSlots) {
             if (!window.adSlots[slotPos].refreshFlag) {
-              googletag.pubads().refresh([ window.adSlots[slotPos] ])
+              if (!window.adSlots[slotPos].isOutOfPage) {
+                googletag.pubads().refresh([ window.adSlots[slotPos] ])
+              } else {
+                window.adSlots[slotPos].display()
+              }
               window.adSlots[slotPos].refreshFlag = true
             }
           }
