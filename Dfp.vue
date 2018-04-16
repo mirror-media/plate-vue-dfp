@@ -1,11 +1,14 @@
 <template>
-  <div :class="`${className} ${extClass}`" :id="adunit" :pos="pos" :style="style"></div>
+  <div :class="`${className} ${extClass}`" :id="adunit" :pos="pos" :style="style" v-if="!isEmpty"></div>
 </template>
 <script>
+  const debug = require('debug')('CLIENT:Dfp')
   export default {
     computed: {
       adunit () {
-        let _unitId = !this.unitId ? this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'aduid' ] : this.unitId
+        let _unitId = !this.unitId
+          ? this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'aduid' ]
+          : this.unitId
         if (this.ifDevMode) {
           _unitId = `test_${_unitId}`
         }
@@ -28,6 +31,9 @@
       },
       ifDevMode () {
         return this.config.mode === 'dev'
+      },
+      isEmpty () {
+        return !this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ]
       }
     },
     data () {
@@ -35,7 +41,7 @@
         style: ''
       }
     },
-    name: 'ad-container',
+    name: 'Dfp',
     methods: {
       defineDfp () {
         googletag.cmd.push(() => {
@@ -43,6 +49,7 @@
             googletag.destroySlots([ window.adSlots[ this.pos ] ])
             googletag.pubads().clear([ window.adSlots[ this.pos ] ])
           }
+          if (this.isEmpty) { return }
           const slot = document.querySelector(`#${this.adunit}`)
           if (slot) {
             slot.removeAttribute('style')
@@ -64,8 +71,8 @@
             try {
               _s.addService(googletag.pubads())
             } catch (err) {
-              console.log('unabled to render ad', this.adunit)
-              console.log('err', err)
+              debug('unabled to render ad', this.adunit)
+              debug('err', err)
               return
             }
             const mapping = (this.currConfig.options[ 'sizeMapping' ] && this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'size-mapping' ]) ? this.currConfig.options[ 'sizeMapping' ][ this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'size-mapping' ] ] : undefined
@@ -79,10 +86,18 @@
             }
             window.adSlots[ this.pos ] = _s
           } else {
-            console.log('##### OOP DETECTED #####')
+            debug('##### OOP DETECTED #####')
             // _s = googletag.defineOutOfPageSlot(`/${this.currConfig.dfpId}/${this.adunit}`
             //                       , this.adunit)
-            _s = googletag.pubads().defineOutOfPagePassback(`/${this.currConfig.dfpId}/${this.adunit}`)
+            _s = googletag.defineOutOfPageSlot(`/${this.currConfig.dfpId}/${this.adunit}`, this.adunit)
+            try {
+              _s.addService(googletag.pubads())
+            } catch (err) {
+              debug('unabled to render oop ad', this.adunit)
+              debug('err', err)
+              return
+            }
+            // _s = googletag.pubads().defineOutOfPagePassback(`/${this.currConfig.dfpId}/${this.adunit}`)
             window.adSlots[ this.pos ] = _s
             window.adSlots[ this.pos ].isOutOfPage = true
           }
@@ -178,7 +193,7 @@
       if (window && window[ 'googletag' ] && window[ 'googletag' ][ 'apiReady' ]) {
         this.defineDfp()
       }
-      this.style = this.currConfig && this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'cont-style' ].join(';')
+      this.style = this.currConfig && !this.isEmpty && this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'cont-style' ].join(';')
     },
     updated () {
       if (window && window[ 'googletag' ] && window[ 'googletag' ][ 'apiReady' ]) {

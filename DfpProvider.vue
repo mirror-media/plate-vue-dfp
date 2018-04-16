@@ -10,6 +10,8 @@
 </template>
 <script>
   import VueDfp from './Dfp.vue'
+  
+  const debug = require('debug')('CLIENT:DfpProvider')
   export default {
     components: {
       'vue-dfp': VueDfp
@@ -62,7 +64,7 @@
         firstDfpRender: false
       }
     },
-    name: 'vue-dfp-provider',
+    name: 'DfpProvider',
     methods: {
       defineDfp () {
         googletag.cmd.push(() => {
@@ -91,8 +93,8 @@
               try {
                 _s.addService(googletag.pubads())
               } catch (err) {
-                console.log('unabled to render ad', _aduid)
-                console.log('err', err)
+                debug('unabled to render ad', _aduid)
+                debug('err', err)
                 return
               }
               const mapping = (this.options[ 'sizeMapping' ] && this.dfpUnits[ this.section ][ _pos ][ 'size-mapping' ]) ? this.options[ 'sizeMapping' ][ this.dfpUnits[ this.section ][ _pos ][ 'size-mapping' ] ] : undefined
@@ -106,9 +108,18 @@
               }
               window.adSlots[ _pos ] = _s
             } else {
-              console.log('##### OOP DETECTED #####')
-              // _s = googletag.defineOutOfPageSlot(`/${this.dfpid}/${_aduid}`, _aduid)
-              _s = googletag.pubads().defineOutOfPagePassback(`/${this.dfpid}/${_aduid}`)
+              debug('##### OOP DETECTED #####')
+              _s = googletag.defineOutOfPageSlot(`/${this.dfpid}/${_aduid}`, _aduid)
+              // _s = googletag.pubads().defineOutOfPagePassback(`/${this.dfpid}/${_aduid}`)
+
+              try {
+                _s.addService(googletag.pubads())
+              } catch (err) {
+                debug('unabled to render oop ad', this.dfpid, _aduid)
+                debug('err', err)
+                return
+              }
+
               window.adSlots[ _pos ] = _s
               window.adSlots[ _pos ].isOutOfPage = true
             }
@@ -350,12 +361,9 @@
       } else {
         googletag.cmd.push(() => {
           for (const slotPos in window.adSlots) {
+            debug('Going to refresh ad slot.', slotPos)
             if (!window.adSlots[slotPos].refreshFlag) {
-              if (!window.adSlots[slotPos].isOutOfPage) {
-                googletag.pubads().refresh([ window.adSlots[slotPos] ])
-              } else {
-                window.adSlots[slotPos].display()
-              }
+              googletag.pubads().refresh([ window.adSlots[slotPos] ])
               window.adSlots[slotPos].refreshFlag = true
             }
           }
