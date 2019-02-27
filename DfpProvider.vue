@@ -69,7 +69,7 @@
       defineDfp () {
         googletag.cmd.push(() => {
           const adContainers = [ ...document.querySelectorAll('.ad-container') ]
-          adContainers.forEach((slot) => {
+          adContainers.forEach(slot => {
             const _aduid = slot.getAttribute('id')
             const _pos = slot.getAttribute('pos')
             const _ifSlotVisible = slot.currentStyle ? slot.currentStyle.display : window.getComputedStyle(slot, null).display
@@ -131,7 +131,7 @@
         })
       },
       loadDfp () {
-        return new Promise((resolve) => {
+        return new Promise(resolve => {
           this.dfpIsLoaded = this.dfpIsLoaded || document.querySelectorAll('script[src*="googletagservices.com/tag/js/gpt.js"]').length
           if (this.dfpIsLoaded) {
             this.dfpInstalled = true
