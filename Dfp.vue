@@ -52,12 +52,15 @@
           if (this.isEmpty) { return }
           const slot = document.querySelector(`#${this.adunit}`)
           if (slot) {
+            debug(`GOING TO REMOVE SLOT#${this.adunit} LAGACY STYLE.`)
             slot.removeAttribute('style')
             slot.innerHtml = ''
             slot.setAttribute('style', this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'cont-style' ].join(';'))
+          } else {
+            debug(`SLOT #${this.adunit} DOESN'T EXIST AT THIS MOMENT.`)
           }
-          const _ifSlotVisible = slot ? (slot.currentStyle ? slot.currentStyle.display : window.getComputedStyle(slot, null).display) : null
-          if (_ifSlotVisible === 'none') {
+          const isSlotVisible = slot ? (slot.currentStyle ? slot.currentStyle.display : window.getComputedStyle(slot, null).display) : null
+          if (isSlotVisible === 'none') {
             delete window.adSlots[ this.pos ]
             return
           }
@@ -71,8 +74,8 @@
             try {
               _s.addService(googletag.pubads())
             } catch (err) {
-              debug('unabled to render ad', this.adunit)
-              debug('err', err)
+              debug('UNABLED TO RENDER AD', this.adunit)
+              debug('ERR', err)
               return
             }
             const mapping = (this.currConfig.options[ 'sizeMapping' ] && this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'size-mapping' ]) ? this.currConfig.options[ 'sizeMapping' ][ this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'size-mapping' ] ] : undefined
@@ -93,8 +96,8 @@
             try {
               _s.addService(googletag.pubads())
             } catch (err) {
-              debug('unabled to render oop ad', this.adunit)
-              debug('err', err)
+              debug('UNABLED TO RENDER OOP AD', this.adunit)
+              debug('ERR', err)
               return
             }
             // _s = googletag.pubads().defineOutOfPagePassback(`/${this.currConfig.dfpId}/${this.adunit}`)
@@ -105,6 +108,13 @@
           window.adSlots[ this.pos ].adId = this.adunit
           window.adSlots[ this.pos ].displayFlag = false
           window.adSlots[ this.pos ].refreshFlag = false
+
+          googletag.cmd.push(() => {
+            if (!window.adSlots[ this.pos ].refreshFlag) {
+              googletag.pubads().refresh([ window.adSlots[ this.pos ] ])
+              window.adSlots[ this.pos ].refreshFlag = true
+            }
+          })
         })
       },
       getDimensions (dimes) {
@@ -125,7 +135,7 @@
         }
         return dimensions
       },
-      ifClient () {
+      isClient () {
         const browser = typeof window !== 'undefined'
         return browser
       }
@@ -190,19 +200,22 @@
       }
     },
     mounted () {
+      debug(`AD ${this.pos} MOUNTED.`)
       if (window && window[ 'googletag' ] && window[ 'googletag' ][ 'apiReady' ]) {
+        debug(`AD ${this.pos} IS GONNA DEFINE ITSELF.`)
         this.defineDfp()
       }
       this.style = this.currConfig && !this.isEmpty && this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'cont-style' ].join(';')
     },
     updated () {
       if (window && window[ 'googletag' ] && window[ 'googletag' ][ 'apiReady' ]) {
+        debug(`AD ${this.pos} IS GONNA DEFINE ITSELF.(UPDATED)`)
         this.defineDfp()
       }
     },
     watch: {
       currPath: function () {
-        if (this.ifClient() && window && window[ 'googletag' ] && window[ 'googletag' ][ 'apiReady' ]) {
+        if (this.isClient() && window && window[ 'googletag' ] && window[ 'googletag' ][ 'apiReady' ]) {
           this.defineDfp()
         }
       }

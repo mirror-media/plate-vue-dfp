@@ -72,14 +72,14 @@
           adContainers.forEach(slot => {
             const _aduid = slot.getAttribute('id')
             const _pos = slot.getAttribute('pos')
-            const _ifSlotVisible = slot.currentStyle ? slot.currentStyle.display : window.getComputedStyle(slot, null).display
+            const isSlotVisible = slot.currentStyle ? slot.currentStyle.display : window.getComputedStyle(slot, null).display
 
             if (window.adSlots[ _pos ]) {
               googletag.destroySlots([ window.adSlots[ _pos ] ])
               googletag.pubads().clear([ window.adSlots[ _pos ] ])
             }
 
-            if (_ifSlotVisible === 'none') {
+            if (isSlotVisible === 'none') {
               delete window.adSlots[ _pos ]
               return
             }
@@ -255,7 +255,7 @@
           googletag.enableServices()
         })
       },
-      ifClient () {
+      isClient () {
         const browser = typeof window !== 'undefined'
         return browser
       },
@@ -350,7 +350,7 @@
     },
     watch: {
       currPath: function () {
-        if (this.ifClient() && window && window[ 'googletag' ] && window[ 'googletag' ][ 'apiReady' ]) {
+        if (this.isClient() && window && window[ 'googletag' ] && window[ 'googletag' ][ 'apiReady' ]) {
           googletag.destroySlots()
         }
       }
@@ -359,15 +359,16 @@
       if (this.dfpInstalled !== true || this.firstDfpRender !== true) {
         return
       } else {
-        googletag.cmd.push(() => {
-          for (const slotPos in window.adSlots) {
-            debug('Going to refresh ad slot.', slotPos)
-            if (!window.adSlots[slotPos].refreshFlag) {
-              googletag.pubads().refresh([ window.adSlots[slotPos] ])
-              window.adSlots[slotPos].refreshFlag = true
-            }
-          }
-        })
+        debug('DFP PROVIDER UPDATED.')
+        // googletag.cmd.push(() => {
+        //   for (const slotPos in window.adSlots) {
+        //     debug('GONNA REFRESH AD SLOT ', slotPos)
+        //     if (!window.adSlots[slotPos].refreshFlag) {
+        //       googletag.pubads().refresh([ window.adSlots[slotPos] ])
+        //       window.adSlots[slotPos].refreshFlag = true
+        //     }
+        //   }
+        // })
       }
     }
   }
