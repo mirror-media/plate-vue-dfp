@@ -26,7 +26,8 @@
           dfpUnits: this.dfpUnits,
           section: this.section,
           dfpId: this.dfpid,
-          mode: this.mode
+          mode: this.mode,
+          sectionTempId: this.options.sectionTempId
         }
       },
       dfpPos () {
