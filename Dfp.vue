@@ -204,21 +204,16 @@
     },
     mounted () {
       debug(`AD ${this.pos} MOUNTED.`)
-      if (window && window[ 'googletag' ] && window[ 'googletag' ][ 'apiReady' ]) {
+      if (window && window[ 'googletag' ] && window[ 'googletag' ][ 'apiReady' ] && this.currConfig.firstDfpRender) {
         debug(`AD ${this.pos} IS GONNA DEFINE ITSELF.`)
         this.defineDfp()
       }
       this.style = this.currConfig && !this.isEmpty && this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'cont-style' ].join(';')
     },
-    updated () {
-      if (window && window[ 'googletag' ] && window[ 'googletag' ][ 'apiReady' ]) {
-        debug(`AD ${this.pos} IS GONNA DEFINE ITSELF.(UPDATED)`)
-        this.defineDfp()
-      }
-    },
     watch: {
       currPath: function () {
         if (this.isClient() && window && window[ 'googletag' ] && window[ 'googletag' ][ 'apiReady' ]) {
+          debug(`AD ${this.pos} IS GONNA DEFINE ITSELF.(CURRPATH)`)
           this.defineDfp()
         }
       }

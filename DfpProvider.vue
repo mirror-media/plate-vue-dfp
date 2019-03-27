@@ -24,6 +24,7 @@
         return {
           vueDfp: this.dfpPos,
           dfpUnits: this.dfpUnits,
+          firstDfpRender: this.firstDfpRender,
           section: this.section,
           dfpId: this.dfpid,
           mode: this.mode,
