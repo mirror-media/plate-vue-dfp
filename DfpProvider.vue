@@ -10,6 +10,7 @@
 </template>
 <script>
   import VueDfp from './Dfp.vue'
+  import uuidv4 from 'uuid/v4'
   
   const debug = require('debug')('CLIENT:DfpProvider')
   export default {
@@ -28,7 +29,7 @@
           section: this.section,
           dfpId: this.dfpid,
           mode: this.mode,
-          sectionTempId: this.options.sectionTempId
+          sessionId: this.sessionId
         }
       },
       dfpPos () {
@@ -63,7 +64,8 @@
           onloaded: [],
           adUnits: []
         },
-        firstDfpRender: false
+        firstDfpRender: false,
+        sessionId: uuidv4()
       }
     },
     name: 'DfpProvider',
@@ -252,7 +254,7 @@
             pubadsService.setCentering(true)
           }
           if (this.dfpOptions[ 'afterEachAdLoaded' ]) {
-            googletag.pubads().addEventListener('slotRenderEnded', this.dfpOptions[ 'afterEachAdLoaded' ])
+            googletag.pubads().addEventListener('slotRenderEnded', this.dfpOptions[ 'afterEachAdLoaded' ].bind(this))
           }
           googletag.enableServices()
         })
@@ -355,6 +357,7 @@
         if (this.isClient() && window && window[ 'googletag' ] && window[ 'googletag' ][ 'apiReady' ]) {
           googletag.destroySlots()
         }
+        this.sessionId = uuidv4()
       }
     },
     updated () {

@@ -1,5 +1,5 @@
 <template>
-  <div :class="`${className} ${extClass}`" :id="adunit" :pos="pos" :style="style" v-if="!isEmpty" :sectionTempId="sectionTempId"></div>
+  <div :class="`${className} ${extClass}`" :id="adunit" :pos="pos" :style="style" v-if="!isEmpty" :sessionId="sessionId"></div>
 </template>
 <script>
   const debug = require('debug')('CLIENT:Dfp')
@@ -35,8 +35,8 @@
       isEmpty () {
         return !this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ]
       },
-      sectionTempId () {
-        return this.currConfig.sectionTempId
+      sessionId () {
+        return this.currConfig.sessionId
       }
     },
     data () {
