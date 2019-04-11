@@ -293,47 +293,50 @@
         this.dfpIsLoaded = false
         window.dfpInstalled = false
         window.dfpIsLoaded = false
+      },
+      dfpLoadedHandler () {
+        if (this.dfpIsLoaded) {
+          if (this.dfpInstalled === true) {
+            googletag.cmd.push(() => {
+              googletag.destroySlots()
+            })
+            // this.dfpInstalled = true
+            // window.dfpInstalled = true
+            // return
+          }
+          if (!window.adSlots) {
+            window.adSlots = {}
+          }
+          this.initDfp()
+          this.defineDfp()
+          googletag.cmd.push(() => {
+            for (const slotPos in window.adSlots) {
+              if (!window.adSlots[slotPos].displayFlag) {
+                if (this.dfpInstalled !== true) {
+                  googletag.display(window.adSlots[slotPos].adId)
+                }
+                window.adSlots[slotPos].displayFlag = true
+              }
+            }
+            for (const slotPos in window.adSlots) {
+              if (!window.adSlots[slotPos].refreshFlag) {
+                if ((this.dfpInstalled === true &&
+                    this.dfpOptions.disableInitialLoad !== true) ||
+                    this.dfpOptions.disableInitialLoad === true) {
+                  googletag.pubads().refresh([ window.adSlots[slotPos] ])
+                }
+                window.adSlots[slotPos].refreshFlag = true
+              }
+            }
+            this.dfpInstalled = true
+            window.dfpInstalled = true
+          })
+          this.firstDfpRender = true
+        }
       }
     },
-    mounted () {
-      this.loadDfp().then(() => {
-        if (this.dfpInstalled === true) {
-          googletag.cmd.push(() => {
-            googletag.destroySlots()
-          })
-          // this.dfpInstalled = true
-          // window.dfpInstalled = true
-          // return
-        }
-        if (!window.adSlots) {
-          window.adSlots = {}
-        }
-        this.initDfp()
-        this.defineDfp()
-        googletag.cmd.push(() => {
-          for (const slotPos in window.adSlots) {
-            if (!window.adSlots[slotPos].displayFlag) {
-              if (this.dfpInstalled !== true) {
-                googletag.display(window.adSlots[slotPos].adId)
-              }
-              window.adSlots[slotPos].displayFlag = true
-            }
-          }
-          for (const slotPos in window.adSlots) {
-            if (!window.adSlots[slotPos].refreshFlag) {
-              if ((this.dfpInstalled === true &&
-                  this.dfpOptions.disableInitialLoad !== true) ||
-                  this.dfpOptions.disableInitialLoad === true) {
-                googletag.pubads().refresh([ window.adSlots[slotPos] ])
-              }
-              window.adSlots[slotPos].refreshFlag = true
-            }
-          }
-          this.dfpInstalled = true
-          window.dfpInstalled = true
-        })
-        this.firstDfpRender = true
-      })
+    beforeMount () {
+      this.loadDfp()
     },
     props: {
       dfpid: {
@@ -358,6 +361,9 @@
           googletag.destroySlots()
         }
         this.sessionId = uuidv4()
+      },
+      dfpIsLoaded: function () {
+        !this.firstDfpRender && this.dfpLoadedHandler()
       }
     },
     updated () {
