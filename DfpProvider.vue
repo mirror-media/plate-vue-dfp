@@ -29,7 +29,8 @@
           section: this.section,
           dfpId: this.dfpid,
           mode: this.mode,
-          sessionId: this.sessionId
+          sessionId: this.sessionId,
+          options: this.options
         }
       },
       dfpPos () {
@@ -101,7 +102,16 @@
                 debug('err', err)
                 return
               }
-              const mapping = (this.options[ 'sizeMapping' ] && this.dfpUnits[ this.section ][ _pos ][ 'size-mapping' ]) ? this.options[ 'sizeMapping' ][ this.dfpUnits[ this.section ][ _pos ][ 'size-mapping' ] ] : undefined
+              const size = slot.getAttribute('size')
+              const mapping = this.options[ 'sizeMapping' ]
+                ? size
+                ? this.options[ 'sizeMapping' ][ size ]
+                : this.dfpUnits[ this.section ][ _pos ][ 'size-mapping' ]
+                ? this.options[ 'sizeMapping' ][ this.dfpUnits[ this.section ][ _pos ][ 'size-mapping' ] ]
+                : undefined
+                : undefined
+              // const mapping = (this.options[ 'sizeMapping' ] && this.dfpUnits[ this.section ][ _pos ][ 'size-mapping' ]) ? this.options[ 'sizeMapping' ][ this.dfpUnits[ this.section ][ _pos ][ 'size-mapping' ] ] : undefined
+
               if (mapping) {
                 // Convert verbose to DFP format
                 let map = googletag.sizeMapping()

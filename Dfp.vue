@@ -1,5 +1,5 @@
 <template>
-  <div :class="`${className} ${extClass}`" :id="adunit" :pos="pos" :style="style" v-if="!isEmpty" :sessionId="sessionId"></div>
+  <div :class="`${className} ${extClass}`" :id="adunit" :pos="pos" :style="style" v-if="!isEmpty" :sessionId="sessionId" :size="size"></div>
 </template>
 <script>
   const debug = require('debug')('CLIENT:Dfp')
@@ -81,7 +81,21 @@
               debug('ERR', err)
               return
             }
-            const mapping = (this.currConfig.options[ 'sizeMapping' ] && this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'size-mapping' ]) ? this.currConfig.options[ 'sizeMapping' ][ this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'size-mapping' ] ] : undefined
+            // const mapping = (this.currConfig.options[ 'sizeMapping' ] && this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'size-mapping' ]) ? this.currConfig.options[ 'sizeMapping' ][ this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'size-mapping' ] ] : undefined
+            const size = slot && slot.getAttribute('size')
+            const mapping = this.currConfig.options[ 'sizeMapping' ]
+              ? size
+              ? this.currConfig.options[ 'sizeMapping' ][ size ]
+              : this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'size-mapping' ]
+              ? this.currConfig.options[ 'sizeMapping' ][ this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'size-mapping' ] ]
+              : undefined
+              : undefined
+
+            debug(`AD ${this.pos}.`)
+            debug(`SIZE ${size}.`)
+            debug(`SIZE-MAPPING ${this.currConfig.options[ 'sizeMapping' ]}.`)
+            debug(`SIZE-MAPPING IN AFPUNITS ${this.currConfig.dfpUnits[ this.currConfig.section ][ this.pos ][ 'size-mapping' ]}`)
+
             if (mapping) {
               // Convert verbose to DFP format
               let map = googletag.sizeMapping()
@@ -182,6 +196,7 @@
           }
         }
       },
+      size: {},
       pos: {
         default: () => { return '' }
       },
