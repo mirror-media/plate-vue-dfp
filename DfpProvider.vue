@@ -346,7 +346,9 @@
       }
     },
     beforeMount () {
-      this.loadDfp()
+      if (!this.disableDfpProvider) {
+        this.loadDfp()
+      }
     },
     props: {
       dfpid: {
@@ -363,11 +365,14 @@
       },
       mode: {
         default: () => { return 'prod' }
+      },
+      disableDfpProvider: {
+        default: false
       }
     },
     watch: {
       currPath: function () {
-        if (this.isClient() && window && window[ 'googletag' ] && window[ 'googletag' ][ 'apiReady' ]) {
+        if (this.isClient() && !this.disableDfpProvider && window && window[ 'googletag' ] && window[ 'googletag' ][ 'apiReady' ]) {
           googletag.destroySlots()
         }
         this.sessionId = uuidv4()
